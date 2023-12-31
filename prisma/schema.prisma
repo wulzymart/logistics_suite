@@ -1,0 +1,449 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// types
+  // @general usage
+type Address {
+  lga String?
+  state String
+  streetAddress String
+}
+type AddressWithLGA {
+  lga String
+  state String
+  streetAddress String
+}
+type History {
+  info String
+  time DateTime
+}
+
+  // @staff usage
+type BankDetails {
+  accountNo String
+  bankName String
+}
+type SupportPeople {
+  name String
+  phoneNumber String
+}
+type SalaryScheme {
+  grossSalary Float
+  tax Float
+  pension Float
+  netSalary Float
+}
+
+  // @orders usage
+type Item {
+  category String
+  condition String
+  description String
+  quantity Int
+  value Float
+  weight Float
+}
+
+type ReceiverInfo {
+  firstName String
+  lastName String
+  phoneNumber String
+  address AddressWithLGA  
+}
+
+  // payments
+type AddedServiceType {
+  name String
+  price Float
+}
+
+type Price {
+  freightPrice Float
+  additionalService AddedServiceType[]
+  totalAdditionalService Float
+  VAT Float
+  subTotal Float
+  Total Float
+}
+
+// enums
+enum Roles {
+  Customer
+  Trip_Staff @map("Trip Staff")
+  Staff
+  Admin
+  Super_Admin @map("Super Admin")
+  Developer
+}
+enum Gender {
+  male
+  female
+}
+
+enum EmploymentType {
+  office
+  trip
+}
+enum TripStaffRoles {
+  Driver
+  Vehicle_Assistant @map("Vehicle Assistant")
+}
+enum Coverage {
+  Interstation
+  Local
+}
+
+enum CustomerType {
+  Individual
+  Ecommerce
+}
+
+// orders
+enum DeliveryTypeOptions {
+  SD @map("Station to Delivery man")
+  Interstation
+  PS @map("Pickup to Station")
+  PD @map("Pickup to Delivery man")
+}
+
+enum ServiceTypeOptions {
+  Regular
+  Express
+}
+
+enum DeliveryStatusOptions {
+  Recieved @map("Order Received")
+  Dispatched
+  Delivered
+}
+
+enum PayOnDeliveryOptions {
+  Yes
+  No
+}
+enum  PaymentTypes {
+  Cash
+  Card
+  Transfer
+}
+
+  // vehicle
+enum VehicleTypes {
+  Bicycle
+  Motorcycle
+  Tricycle
+  Car
+  Van
+  Bus
+  Truck
+  Trailer
+}
+
+  // review
+enum Reviewer {
+  Sender
+  Receiver
+}
+enum Reactions {
+  approved
+  noted
+  responded
+  pending
+}
+
+  // expenses
+
+enum  Purposes {
+  Marketing
+  Loading
+  Unloading
+  TA @map("Trip Allowance") 
+  Fueling 
+  Others
+}
+// models
+model State {
+  id String @id @db.ObjectId @default(auto()) @map("_id")
+  name String @unique
+  code String @unique
+  capitalCity String
+  capitalCityCode String @unique
+  lat Float?
+  long Float?
+  lgas Lga[]
+  stations Station[]
+}
+model Lga {
+  id String @id @db.ObjectId @default(auto()) @map("_id")
+  name String
+  stateId String @db.ObjectId
+  state State @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stations Station[]
+  @@index([name])
+}
+model Station {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  address AddressWithLGA
+  state String
+  State State @relation(fields: [state], references: [name], onDelete: Cascade, onUpdate: Cascade)
+  lga String
+  lgaId String @db.ObjectId
+  LGA Lga @relation(fields: [lgaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  phoneNumbers String[]
+  shortCode String
+  officeStaff OfficeStaff[]
+  tripStaff TripStaff[]
+  routeOrigins Route[] @relation("origin station")
+  routeDestinations Route[] @relation("destination station")
+  tripOrigin InterstationTrip[] @relation("origin")
+  tripDestination InterstationTrip[] @relation("destination")
+  incomingOrders Order[] @relation("origin station")
+  outgoingOrders Order[] @relation("destination station")
+  localTrips LocalTrip[]
+  vehicles Vehicle[]
+  Payments Payment[]
+  expenses Expenses[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userName String @unique
+  email String? @unique
+  password String
+  pin String?
+  role Roles
+  customerDetails Customer?
+  staffDetails Staff?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Staff {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String? @db.ObjectId @unique
+  userInfo User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName String
+  phoneNumbers String @unique
+  gender Gender
+  qualification String?
+  address Address
+  guarantors SupportPeople[]
+  nextOfKin SupportPeople
+  employmentType EmploymentType
+  paymentDetails PayRole?
+  officeStaffInfo OfficeStaff?
+  tripStaffInfo TripStaff? 
+  tripStaffId String? @db.ObjectId
+  expensesRequested Expenses[]
+  dateOfBiirth DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model OfficeStaff {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  staffId String @db.ObjectId @unique
+  stationName String
+  station Station @relation(fields: [stationName], references: [name])
+  staffInfo Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  ordersProcessed Order[]
+  paymentsProcessed Payment[]
+  role String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TripStaff {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  staffId String @db.ObjectId @unique
+  staffInfo Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  role TripStaffRoles
+  attendantLocalTrips LocalTrip[] @relation("attendant")
+  attendantInterstationTrips InterstationTrip[] @relation("attendant")
+  driverLocalTrips LocalTrip[] @relation("driver")
+  driverInterstationTrips InterstationTrip[] @relation("driver")
+  coverage Coverage
+  stationName String?
+  station Station? @relation(fields: [stationName], references: [name])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model PayRole {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  staffId String @db.ObjectId @unique
+  staffDetails Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  bankDetails BankDetails?
+  salary SalaryScheme
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName String
+  userId String? @db.ObjectId @unique
+  userInfo User? @relation(fields: [userId], references: [id])
+  customerType CustomerType
+  businessName String? @unique
+  phoneNumber String @unique
+  email String? @unique
+  address Address
+  history History[]
+  orders Order[]
+  payments Payment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  customerId String @db.ObjectId
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  trackingNumber String @unique
+  receiver ReceiverInfo
+  originStationId String @db.ObjectId
+  originStation Station @relation("origin station", fields: [originStationId], references: [id])
+  isLocalOrder Boolean @default(false)
+  deliveryService ServiceTypeOptions
+  deliveryType DeliveryTypeOptions
+  deliveryStatus DeliveryStatusOptions @default(Recieved)
+  destinationStationId String @db.ObjectId
+  destinationStation Station @relation("destination station", fields: [destinationStationId], references: [id])
+  charges Price
+  paid Boolean @default(false)
+  payOnDelevery PayOnDeliveryOptions @default(No)
+  history History[]
+  trackingInfo History[]
+  tripId String? @db.ObjectId
+  localTrip LocalTrip? @relation(fields: [tripId], references: [id])
+  interstationTrip InterstationTrip? @relation(fields: [tripId], references: [id])
+  processedById String @db.ObjectId
+  processedBy OfficeStaff @relation(fields: [processedById], references: [id])
+  paymentInfo Payment?
+  reviews Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Payment {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  orderId String @db.ObjectId @unique
+  stationId String @db.ObjectId
+  customerId String @db.ObjectId
+  customer Customer @relation(fields: [customerId], references: [id])
+  station Station  @relation(fields: [stationId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+  paymentType PaymentTypes @default(Cash)
+  processedById String @db.ObjectId
+  processedBy OfficeStaff @relation(fields: [processedById], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Route {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  trips InterstationTrip[]
+  originStationId String @db.ObjectId
+  originStation Station @relation("origin station", fields: [originStationId], references: [id])
+  destinationStationId String @db.ObjectId
+  destinationStation Station @relation("destination station", fields: [destinationStationId], references: [id])
+  name String @unique
+  states String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LocalTrip {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  name String @unique
+  stationId String @db.ObjectId
+  station Station @relation(fields: [stationId], references: [id])
+  vehicleId String @db.ObjectId
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  attendantId String? @db.ObjectId
+  attendant TripStaff? @relation("attendant",fields: [attendantId], references: [id])
+  driverId String @db.ObjectId
+  driver TripStaff @relation("driver", fields: [driverId], references: [id])
+  orders Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InterstationTrip {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  name String @unique
+  routeId String @db.ObjectId
+  route Route @relation(fields: [routeId], references: [id])
+  vehicleId String @db.ObjectId
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  attendantId String @db.ObjectId
+  attendant TripStaff @relation("attendant",fields: [attendantId], references: [id])
+  driverId String @db.ObjectId
+  driver TripStaff @relation("driver", fields: [driverId], references: [id])
+  orders Order[]
+  originStationId String @db.ObjectId
+  originStation Station @relation("origin", fields: [originStationId], references: [id])
+  destinationStationId String @db.ObjectId
+  destinationStation Station @relation("destination", fields: [destinationStationId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vehicle {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  name String @unique
+  stationId String @db.ObjectId
+  station Station @relation(fields: [stationId], references: [id], onUpdate: Cascade)
+  localTrips LocalTrip[]
+  interstationTrips InterstationTrip[]
+  type VehicleTypes?
+  brand String?
+  model String?
+  color String?
+  year String?
+  registrationNumber String @unique
+  engineNumber String? @unique
+  coverage Coverage @default(Local)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  orderId String @db.ObjectId
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  name String
+  phoneNumber String?
+  reviewer Reviewer
+  rating Int
+  review String
+  reaction Reactions @default(pending)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Expenses {
+  id String @id @default(auto()) @db.ObjectId @map("_id")
+  purpose Purposes
+  amount Float
+  description String
+  orderId String? @db.ObjectId
+  tripId String? @db.ObjectId
+  approved Boolean @default(false)
+  staffId String @db.ObjectId
+  requestedBy Staff @relation(fields: [staffId], references: [id])
+  station Station @relation(fields: [stationId], references: [id])
+  stationId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
