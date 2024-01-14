@@ -11,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -23,17 +22,28 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import FormInput from "@/components/form-input";
-import FormSelect from "@/components/form-select";
+import { startTransition } from "react";
+import { newUserRegistration } from "@/lib/actions";
+import { APIResponseObject } from "@/types";
+import ConfirmPin from "@/components/confirm-pin";
+
 const formSchema = z
   .object({
-    userName: z.string().min(3, { message: "must have minimum of 3 letters" }),
-    email: z
+    userName: z
       .string()
-      .email({ message: "Please provide a valid Email" })
-      .optional(),
-    password: z.string().min(6),
+      .min(3, {
+        message: "minimum of 3 characters (must start a letter)",
+      })
+      .regex(/^[a-zA-Z][a-zA-Z0-9]+$/, {
+        message:
+          "Can only contain alphanumeric characters starting with letters",
+      })
+      .trim()
+      .refine((s) => !s.includes(" "), "Ensure No Spaces!"),
+    email: z.string().email({ message: "Please provide a valid Email" }),
+    password: z.string().min(6, { message: "at least 6 characters" }),
     confirmPassword: z.string().min(6),
-    role: z.string(),
+    role: z.string().min(2, { message: "Please select a role" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords dont match",
@@ -55,49 +65,32 @@ const NewUserForm = () => {
     },
   });
   const { isSubmitting, isValid } = form.formState;
+  const validatePin = () => {
+    document.getElementById("user-reg")?.click();
+  };
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const valuesCopy: any = values;
-    delete valuesCopy.confirmPassword;
-    await fetch("/api/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(valuesCopy),
-    })
-      .then(async (res) => {
-        const resData = await res.json();
-
-        if (res.ok) {
+    startTransition(() => {
+      newUserRegistration(values).then((data: APIResponseObject) => {
+        if (data.success) {
           toast({
             description: "User created Please Continue with staff details",
           });
-          router.push(`/office/super-admin/staff/${resData?.id}`);
-        } else if (resData?.code === "P2002") {
-          const errorKey = resData.meta.target;
-          if (errorKey.includes("userName"))
-            toast({
-              variant: "destructive",
-              description: "User with the username already exists",
-            });
-          else
-            toast({
-              variant: "destructive",
-              description: "User with the email already exists",
-            });
-        }
-      })
-      .catch((error) => {
-        toast({
-          description: "An error occured, try again later",
-          variant: "destructive",
-        });
+          router.push(`/office/super-admin/staff/${data.user.id}`);
+        } else
+          toast({
+            variant: "destructive",
+            description: data.message,
+          });
       });
+    });
   };
   return (
-    <div className="border shadow-sm p-8 rounded-lg">
+    <div className="border shadow-sm p-8 rounded-lg w-full">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(validatePin)}
+          className="w-full space-y-6"
+        >
           <FormInput
             control={form.control}
             name="userName"
@@ -112,14 +105,7 @@ const NewUserForm = () => {
             type="email"
             placeholder="e.g janejones@example.com"
           />
-          <FormSelect
-            data={roles}
-            name="role"
-            label="Role"
-            control={form.control}
-            placeholder="Select Role"
-          />
-          {/* <FormField
+          <FormField
             control={form.control}
             name="role"
             render={({ field }) => (
@@ -145,7 +131,7 @@ const NewUserForm = () => {
                 <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
           <FormInput
             control={form.control}
             name="password"
@@ -159,6 +145,11 @@ const NewUserForm = () => {
             label="Confirm Password"
             type="password"
             placeholder="min 6 characters"
+          />
+          <ConfirmPin
+            id="user-reg"
+            name="Submit"
+            action={form.handleSubmit(onSubmit)}
           />
           <Button type="submit">Submit</Button>
         </form>

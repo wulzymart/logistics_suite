@@ -15,22 +15,30 @@ const FormInput = ({
   label,
   type,
   placeholder,
+  message,
 }: {
   control: Control<any>;
   name: string;
   label: string;
   type?: string;
   placeholder?: string;
+  message?: string;
 }) => {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="w-full">
           <FormLabel>{label}</FormLabel>
+
           <FormControl>
-            <Input type={type} {...field} placeholder={placeholder} />
+            <div>
+              <Input type={type} {...field} placeholder={placeholder} />
+              <span className="text-sm font-light text-gray-700">
+                {message}
+              </span>
+            </div>
           </FormControl>
           <FormMessage />
         </FormItem>

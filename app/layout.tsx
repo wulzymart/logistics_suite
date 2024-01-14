@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import QueryProvider from "./hooks/query-provider";
+import { getServerSession } from "next-auth";
+import SessionProvider from "./hooks/session-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,16 +30,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
-        <Toaster />
+        <SessionProvider session={session}>
+          <QueryProvider>
+            {children}
+            <Toaster />
+          </QueryProvider>
+        </SessionProvider>
       </body>
     </html>
   );

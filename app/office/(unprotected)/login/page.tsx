@@ -20,7 +20,7 @@ export default function Login() {
               Please sign in to your account.
             </p>
           </div>
-          <LoginForm darkBg={true} />
+          <LoginForm darkBg={true} callbackUrl="/office" />
         </div>
       </div>
     </div>

@@ -12,35 +12,50 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please provide a valid email" }),
+  usernameOrEmail: z
+    .string()
+    .min(3, { message: "Please provide a valid username or email" }),
   password: z.string().min(6, { message: "Minimum of 6 characters" }),
 });
 
-const LoginForm = ({ darkBg }: { darkBg?: Boolean } = { darkBg: false }) => {
+const LoginForm = ({
+  darkBg,
+  callbackUrl,
+}: {
+  darkBg?: Boolean;
+  callbackUrl: string;
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      usernameOrEmail: "",
       password: "",
     },
   });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    signIn("credentials", {
+      callbackUrl: callbackUrl,
+      ...values,
+    });
+  };
 
   return (
     <div className="w-full bg-black/5 p-10 rounded-lg">
       <Form {...form}>
-        <form className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
-            name="email"
+            name="usernameOrEmail"
             control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className={darkBg ? "text-white" : ""}>
-                  Email
+                  Username or Email
                 </FormLabel>
                 <FormControl>
-                  <Input type="email" {...field} />
+                  <Input type="text" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
