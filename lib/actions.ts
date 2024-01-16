@@ -107,3 +107,17 @@ export const addStation = async (values: any) => {
 
   return await res.json();
 };
+
+export const getStates = async () => {
+  const res = await fetch(`${api}/states`, {
+    next: { tags: [`states_list`] },
+  });
+  return res.json();
+};
+
+export const getLgas = async (state: string) => {
+  const res = await fetch(`${api}/states/${state}/lgas`, {
+    next: { tags: [`${state}-lgas`] },
+  });
+  return res.json();
+};

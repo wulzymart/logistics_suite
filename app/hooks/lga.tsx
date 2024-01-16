@@ -1,16 +1,14 @@
+import { getLgas } from "@/lib/actions";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-
-const getLgas = async (state: string) => {
-  axios;
-};
 
 const GetLGA = (state: string): UseQueryResult<any, Error> => {
   const LgaQuery = useQuery({
     queryKey: [`${state}-lgas`],
     queryFn: async () => {
       if (!state) throw Error();
-      const { data } = await axios.get(`/api/states/${state}/lgas`);
+      const data = await getLgas(state);
+      if (!data.success) throw Error();
       return data;
     },
   });

@@ -18,45 +18,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FormInput from "@/components/form-input";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Lga, State, Station } from "@prisma/client";
 import GetLGA from "@/app/hooks/lga";
 import FormTextarea from "@/components/form-textarea";
 import { Button } from "@/components/ui/button";
 import ConfirmPin from "@/components/confirm-pin";
 import { startTransition } from "react";
-import { addStation } from "@/lib/actions";
+import { addStation, getStates } from "@/lib/actions";
 import { APIResponseObject } from "@/types";
 import { toast } from "@/components/ui/use-toast";
-
-export function compare(a: State | Lga, b: State | Lga) {
-  if (a.name < b.name) {
-    return -1;
-  }
-  if (a.name > b.name) {
-    return 1;
-  }
-  return 0;
-}
-const formSchema = z.object({
-  name: z.string().min(3, { message: "Name is a minimum of 3 characters" }),
-  shortCode: z
-    .string()
-    .min(2, { message: "Station code can only be 2 or 3 characters" })
-    .max(3, { message: "Station code can only be 2 or 3 characters" }),
-  state: z.string().min(2, { message: "Please select a state" }),
-  lgaId: z.string().min(2, { message: "Please select a LGA" }),
-  lga: z.string(),
-  address: z.string().min(10, { message: "Provide a detailed street address" }),
-  phoneNumbers: z
-    .string()
-    .min(10, { message: "Please Provide valid Phone numbers" }),
-});
+import { stationFormSchema } from "@/lib/zodSchemas";
+import { compare } from "@/lib/utils";
+import { SaveStation } from "@/app/hooks/stations";
 
 const StationForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof stationFormSchema>>({
+    resolver: zodResolver(stationFormSchema),
     defaultValues: {
       name: "",
       shortCode: "",
@@ -70,35 +48,44 @@ const StationForm = () => {
   const { isLoading, data, isError } = useQuery({
     queryKey: ["states_list"],
     queryFn: async () => {
-      const { data } = await axios.get("/api/states");
+      const data = await getStates();
+      if (!data?.success) throw Error();
       return data;
     },
   });
-
-  const lgas = GetLGA(form.watch("state"));
+  let state = form.watch("state");
+  const lgas = GetLGA(state);
+  let lga = form.watch("lga");
+  const { mutate } = SaveStation(state, lga);
   const validatePin = () => {
     (document.getElementById("station-reg") as HTMLDialogElement)?.click();
   };
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof stationFormSchema>) => {
     const lga: Lga = JSON.parse(values.lgaId);
 
     values.lga = lga.name;
     values.lgaId = lga.id;
     // (values as any).lgaId = lga.id;
-    startTransition(() => {
-      addStation(values).then((data: APIResponseObject) => {
-        if (data.success) {
-          toast({
-            description: data.message,
-          });
-          form.reset();
-        } else {
-          toast({
-            description: data.message,
-            variant: "destructive",
-          });
-        }
-      });
+
+    mutate(values, {
+      onSuccess: (data) => {
+        toast({
+          description: data.message,
+        });
+        form.reset();
+      }, onError: (error)
+    }).then((data: APIResponseObject) => {
+      if (data.success) {
+        toast({
+          description: data.message,
+        });
+        form.reset();
+      } else {
+        toast({
+          description: data.message,
+          variant: "destructive",
+        });
+      }
     });
   };
   return (
@@ -191,9 +178,9 @@ const StationForm = () => {
                       <SelectValue placeholder="Select LGA" />
                     </SelectTrigger>
                     <SelectContent>
-                      {!lgas.isLoading &&
-                        !lgas.isError &&
-                        lgas.data.lgas.sort(compare).map((lga: Lga) => (
+                      {!lgas?.isLoading &&
+                        !lgas?.isError &&
+                        lgas?.data?.lgas?.sort(compare).map((lga: Lga) => (
                           <SelectItem key={lga.id} value={JSON.stringify(lga)}>
                             {lga.name}
                           </SelectItem>
@@ -209,7 +196,7 @@ const StationForm = () => {
         <FormTextarea
           name="address"
           control={form.control}
-          label="Address"
+          label="Street address"
           placeholder="e.g 10 Ajayi Street, Ikeja, Lagos"
         />
         <ConfirmPin
@@ -217,7 +204,11 @@ const StationForm = () => {
           name="Add station"
           action={form.handleSubmit(onSubmit)}
         />
-        <Button size="lg" type="submit">
+        <Button
+          size="lg"
+          type="button"
+          onClick={() => console.log(submitMutation)}
+        >
           Add Station
         </Button>
       </form>

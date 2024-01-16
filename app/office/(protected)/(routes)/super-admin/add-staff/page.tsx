@@ -1,7 +1,6 @@
-import { Separator } from "@/components/ui/separator";
-import NewUserForm from "./_components/new-user-form";
 import Image from "next/image";
 import Title from "@/components/app_title";
+import NewStaffForm from "./_components/new-staff-form";
 
 const NewStaffPage = async () => {
   return (
@@ -10,16 +9,8 @@ const NewStaffPage = async () => {
         title="Staff Registration"
         info="Please provide the following details for your staff"
       />
-      <div className="grid col-1 md:grid-cols-2 gap-6 mt-20">
-        <div className="hidden md:block h-[600px] relative">
-          <Image
-            src="/staff-only.jpg"
-            alt="image"
-            fill
-            className="rounded-lg object-cover"
-          />
-        </div>
-        <NewUserForm />
+      <div className="">
+        <NewStaffForm />
       </div>
     </div>
   );

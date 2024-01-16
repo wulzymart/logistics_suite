@@ -35,11 +35,18 @@ type BankDetails {
 type SupportPeople {
   name String
   phoneNumber String
+  address String
 }
+type guarantor {
+  name String
+  phoneNumber String
+}
+
 type SalaryScheme {
   grossSalary Float
   tax Float
   pension Float
+  otherDeductions Float?
   netSalary Float
 }
 
@@ -234,18 +241,17 @@ model Staff {
   userInfo User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   firstName String
   lastName String
+  middleName String?
   phoneNumbers String[] @unique
   gender Gender
   imgUrl String?
-  qualification String?
+  qualifications String?
   address Address
-  guarantors SupportPeople[]
+  guarantors guarantor[]
   nextOfKin SupportPeople
-  employmentType EmploymentType
   paymentDetails PayRole?
   officeStaffInfo OfficeStaff?
-  tripStaffInfo TripStaff? 
-  tripStaffId String? @db.ObjectId
+  tripStaffInfo TripStaff?
   expensesRequested Expenses[]
   dateOfBirth DateTime?
   createdAt DateTime @default(now())
@@ -259,7 +265,6 @@ model OfficeStaff {
   staffInfo Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
   ordersProcessed Order[]
   paymentsProcessed Payment[]
-  role String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
