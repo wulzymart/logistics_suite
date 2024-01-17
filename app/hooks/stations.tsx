@@ -28,6 +28,7 @@ export const SaveStation = (
   const stationsMutation = useMutation({
     mutationKey: [`${state}-stations`, `${lga}-stations`],
     mutationFn: async (values: z.infer<typeof stationFormSchema>) => {
+      console.log(state,lga)
       if (!state || !lga) throw Error;
       if (!values) throw Error;
       const data = await addStation(values);

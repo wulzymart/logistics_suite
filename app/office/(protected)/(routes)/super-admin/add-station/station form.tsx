@@ -73,20 +73,11 @@ const StationForm = () => {
           description: data.message,
         });
         form.reset();
-      }, onError: (error)
-    }).then((data: APIResponseObject) => {
-      if (data.success) {
-        toast({
-          description: data.message,
-        });
-        form.reset();
-      } else {
-        toast({
-          description: data.message,
+      }, onError: (error) => {toast({
+          description: error.message,
           variant: "destructive",
-        });
-      }
-    });
+        });}
+    })
   };
   return (
     <Form {...form}>
@@ -206,8 +197,7 @@ const StationForm = () => {
         />
         <Button
           size="lg"
-          type="button"
-          onClick={() => console.log(submitMutation)}
+          type="submit"
         >
           Add Station
         </Button>
