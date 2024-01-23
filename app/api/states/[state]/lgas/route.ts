@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { errorHandler } from "@/lib/error-handler";
 import {
   notFoundResponse,
-  internalServerError,
   successResponse,
 } from "@/lib/responses";
 

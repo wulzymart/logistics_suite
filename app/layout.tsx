@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import QueryProvider from "./hooks/query-provider";
+import QueryProvider from "../hooks/query-provider";
 import { getServerSession } from "next-auth";
-import SessionProvider from "./hooks/session-provider";
+import SessionProvider from "../hooks/session-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 

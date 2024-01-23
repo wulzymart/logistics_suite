@@ -74,6 +74,7 @@ export const verifyPin = async (values: any) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(values),
+    cache: "no-cache",
   });
 
   return await res.json();
@@ -96,6 +97,8 @@ export const changePassword = async (values: any) => {
 };
 
 export const addStation = async (values: any) => {
+  console.log("addStation", values);
+
   values.phoneNumbers = values.phoneNumbers.split(" ");
   const res = await fetch(`${api}/stations`, {
     method: "POST",
@@ -103,7 +106,12 @@ export const addStation = async (values: any) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(values),
+    cache: "no-cache",
   });
+  if (res.ok) {
+    revalidateTag("stations_list");
+    revalidateTag(`${values.state}-stations`);
+  }
 
   return await res.json();
 };
@@ -118,6 +126,20 @@ export const getStates = async () => {
 export const getLgas = async (state: string) => {
   const res = await fetch(`${api}/states/${state}/lgas`, {
     next: { tags: [`${state}-lgas`] },
+  });
+  return res.json();
+};
+
+export const getStateStations = async (state: string) => {
+  const res = await fetch(`${api}/states/${state}/stations`, {
+    next: { tags: [`${state}-stations`] },
+  });
+  return res.json();
+};
+
+export const getStations = async () => {
+  const res = await fetch(`${api}/stations`, {
+    next: { tags: [`stations_list`] },
   });
   return res.json();
 };

@@ -18,12 +18,12 @@ export function errorHandler(error: any) {
     if (error.code === "P2010") return internalServerError();
     if (error.code === "P2023") return invalidIdResponse();
     if (error.code === "P2002") {
-      const errorKey = error.meta?.target as string;
-      const message: string = errorKey
-        ? errorKey.includes("userName")
-          ? "User with the username already exists"
-          : "User with the email already exists"
-        : "User Credentials already exist";
+      const { modelName, target } = error.meta as {
+        modelName: string;
+        target: string;
+      };
+      const key = target.split("_")[1];
+      const message: string = `${modelName} with same ${key} already exists`;
       return failureResponse(message, 400);
     }
     return internalServerError();

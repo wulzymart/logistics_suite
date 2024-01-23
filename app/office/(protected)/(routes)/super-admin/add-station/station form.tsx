@@ -20,7 +20,6 @@ import {
 import FormInput from "@/components/form-input";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Lga, State, Station } from "@prisma/client";
-import GetLGA from "@/app/hooks/lga";
 import FormTextarea from "@/components/form-textarea";
 import { Button } from "@/components/ui/button";
 import ConfirmPin from "@/components/confirm-pin";
@@ -30,7 +29,7 @@ import { APIResponseObject } from "@/types";
 import { toast } from "@/components/ui/use-toast";
 import { stationFormSchema } from "@/lib/zodSchemas";
 import { compare } from "@/lib/utils";
-import { SaveStation } from "@/app/hooks/stations";
+import { GetStates, Getlgas } from "@/hooks/states_lga";
 
 const StationForm = () => {
   const form = useForm<z.infer<typeof stationFormSchema>>({
@@ -39,33 +38,36 @@ const StationForm = () => {
       name: "",
       shortCode: "",
       state: "",
-      lgaId: "",
+      lga: "",
       address: "",
       phoneNumbers: "",
-      lga: "",
     },
   });
-  const { isLoading, data, isError } = useQuery({
-    queryKey: ["states_list"],
-    queryFn: async () => {
-      const data = await getStates();
-      if (!data?.success) throw Error();
+  const {
+    isLoading: isLoadingStates,
+    data: statesData,
+    isError: isErrorStates,
+  } = GetStates();
+  let state = form.watch("state");
+  const {
+    isLoading: isLoadingLgas,
+    isError: isErrorLgas,
+    data: lgasData,
+  } = Getlgas(state);
+  const { mutate } = useMutation({
+    mutationKey: ["stations_list", `${state}-stations`],
+    mutationFn: async (values: z.infer<typeof stationFormSchema>) => {
+      if (!values) throw Error;
+      const data = await addStation(values);
+      if (!data.success) throw Error(data.message);
       return data;
     },
   });
-  let state = form.watch("state");
-  const lgas = GetLGA(state);
-  let lga = form.watch("lga");
-  const { mutate } = SaveStation(state, lga);
   const validatePin = () => {
     (document.getElementById("station-reg") as HTMLDialogElement)?.click();
   };
   const onSubmit = (values: z.infer<typeof stationFormSchema>) => {
-    const lga: Lga = JSON.parse(values.lgaId);
-
-    values.lga = lga.name;
-    values.lgaId = lga.id;
-    // (values as any).lgaId = lga.id;
+    console.log(values);
 
     mutate(values, {
       onSuccess: (data) => {
@@ -73,19 +75,13 @@ const StationForm = () => {
           description: data.message,
         });
         form.reset();
-      }, onError: (error)
-    }).then((data: APIResponseObject) => {
-      if (data.success) {
+      },
+      onError: (error) => {
         toast({
-          description: data.message,
-        });
-        form.reset();
-      } else {
-        toast({
-          description: data.message,
+          description: error.message,
           variant: "destructive",
         });
-      }
+      },
     });
   };
   return (
@@ -129,20 +125,27 @@ const StationForm = () => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger
-                      disabled={isError || isLoading || !data.success}
+                      disabled={
+                        isErrorStates || isLoadingStates || !statesData.success
+                      }
                       className="w-full"
                     >
-                      <SelectValue
-                        placeholder="Select State"
-                        className="w-full"
-                      />
+                      {field.value ? (
+                        <SelectValue
+                          placeholder="Select State"
+                          className="w-full"
+                        />
+                      ) : (
+                        "Select State"
+                      )}
                     </SelectTrigger>
                     <SelectContent>
-                      {!isLoading &&
-                        !isError &&
-                        data.states.sort(compare).map((state: State) => (
+                      {!isLoadingStates &&
+                        !isErrorStates &&
+                        statesData.states.sort(compare).map((state: State) => (
                           <SelectItem key={state.id} value={state.name}>
                             {state.name}
                           </SelectItem>
@@ -156,7 +159,7 @@ const StationForm = () => {
           />
           <FormField
             control={form.control}
-            name="lgaId"
+            name="lga"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>LGA</FormLabel>
@@ -164,24 +167,33 @@ const StationForm = () => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger
                       disabled={
-                        isError ||
-                        isLoading ||
-                        lgas.isError ||
-                        lgas.isLoading ||
-                        !lgas.data.success
+                        isErrorStates ||
+                        isLoadingStates ||
+                        isErrorLgas ||
+                        isLoadingLgas ||
+                        !lgasData.success
                       }
                       className="w-full"
                     >
-                      <SelectValue placeholder="Select LGA" />
+                      {field.value ? (
+                        <SelectValue placeholder="Select LGA" />
+                      ) : !state ? (
+                        "Awaiting state"
+                      ) : isErrorLgas || isLoadingLgas ? (
+                        "Loading..."
+                      ) : (
+                        "Select LGA"
+                      )}
                     </SelectTrigger>
                     <SelectContent>
-                      {!lgas?.isLoading &&
-                        !lgas?.isError &&
-                        lgas?.data?.lgas?.sort(compare).map((lga: Lga) => (
-                          <SelectItem key={lga.id} value={JSON.stringify(lga)}>
+                      {!isLoadingLgas &&
+                        !isErrorLgas &&
+                        lgasData?.lgas?.sort(compare).map((lga: Lga) => (
+                          <SelectItem key={lga.id} value={lga.name}>
                             {lga.name}
                           </SelectItem>
                         ))}
@@ -207,7 +219,7 @@ const StationForm = () => {
         <Button
           size="lg"
           type="button"
-          onClick={() => console.log(submitMutation)}
+          onClick={() => form.handleSubmit(validatePin)()}
         >
           Add Station
         </Button>

@@ -20,7 +20,7 @@ import FormInput from "@/components/form-input";
 import { Lga, State } from "@prisma/client";
 import FormTextarea from "@/components/form-textarea";
 import { compare } from "@/lib/utils";
-import GetLGA from "@/app/hooks/lga";
+import GetLGA from "@/hooks/states_lga";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const staffFormSchema = z.object({

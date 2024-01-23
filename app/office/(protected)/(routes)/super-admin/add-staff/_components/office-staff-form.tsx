@@ -1,4 +1,22 @@
-import React from "react";
+"use client";
+
+import { UseFormReturn, useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import FormInput from "@/components/form-input";
 
 const OfficeStaffForm = () => {
   return <div className="border shadow-sm p-8 rounded-lg w-full">

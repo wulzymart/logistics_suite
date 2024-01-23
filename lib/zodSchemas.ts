@@ -93,11 +93,10 @@ export const stationFormSchema = z.object({
   name: z.string().min(3, { message: "Name is a minimum of 3 characters" }),
   shortCode: z
     .string()
-    .min(2, { message: "Station code can only be 2 or 3 characters" })
-    .max(3, { message: "Station code can only be 2 or 3 characters" }),
+    .min(3, { message: "Station code can only be 3 or 6 characters" })
+    .max(6, { message: "Station code can only be 3 or 6 characters" }),
   state: stateSchema,
-  lgaId: lgaSchema,
-  lga: z.string(),
+  lga: lgaSchema,
   address: addressSchema,
   phoneNumbers: ngPhoneNumbersSchema,
 });
