@@ -6,8 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { Input } from "./ui/input";
-import { Control } from "react-hook-form";
+import { Control, FormState, UseFormGetFieldState } from "react-hook-form";
 import { Textarea } from "./ui/textarea";
 
 const FormTextarea = ({

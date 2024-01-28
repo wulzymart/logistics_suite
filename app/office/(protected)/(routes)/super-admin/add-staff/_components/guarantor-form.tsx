@@ -11,10 +11,9 @@ const GuarantorForm = ({
 }: {
   form: UseFormReturn<
     {
-      name1: string;
-      phoneNumber1: string;
-      name2: string;
-      phoneNumber2: string;
+      address: string;
+      name: string;
+      phoneNumber: string;
     },
     any,
     undefined
@@ -24,44 +23,33 @@ const GuarantorForm = ({
     <div className="border shadow-sm p-8 rounded-lg w-full">
       <Form {...form}>
         <form className="w-full space-y-6">
-          <FormLabel>Guarantor 1</FormLabel>
+          <FormLabel className="">Guarantor&apos;s Information</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             <FormInput
               control={form.control}
-              name="name1"
+              name="name"
               label="Full name"
               type="text"
               placeholder="e.g jane jones"
             />
             <FormInput
               control={form.control}
-              name="phoneNumber1"
+              name="phoneNumber"
               label="Phone number"
               type="text"
               placeholder="e.g +23409123456789"
             />
           </div>
-          <FormLabel>Guarantor 2</FormLabel>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput
-              control={form.control}
-              name="name2"
-              label="Full name"
-              type="text"
-              placeholder="e.g jane jones"
-            />
-            <FormInput
-              control={form.control}
-              name="phoneNumber2"
-              label="Phone number"
-              type="text"
-              placeholder="e.g +23409123456789"
-            />
-          </div>
+
+          <FormTextarea
+            name="address"
+            control={form.control}
+            label="Street address"
+            placeholder="e.g 10 Ajayi Street, Ikeja, Lagos"
+          />
         </form>
       </Form>
     </div>
   );
 };
-
 export default GuarantorForm;

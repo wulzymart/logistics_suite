@@ -12,7 +12,7 @@ datasource db {
 
 // types
   // @general usage
-type Address {
+type  Address {
   lga String?
   state String
   streetAddress String
@@ -36,10 +36,6 @@ type SupportPeople {
   name String
   phoneNumber String
   address String
-}
-type guarantor {
-  name String
-  phoneNumber String
 }
 
 type SalaryScheme {
@@ -85,10 +81,10 @@ type Price {
 // enums
 enum Roles {
   Customer
-  Trip_Staff @map("Trip Staff")
+  Trip_Staff
   Staff
   Admin
-  Super_Admin @map("Super Admin")
+  Super_Admin
   Developer
 }
 enum Gender {
@@ -102,7 +98,7 @@ enum EmploymentType {
 }
 enum TripStaffRoles {
   Driver
-  Vehicle_Assistant @map("Vehicle Assistant")
+  Assistant
 }
 enum Coverage {
   Interstation
@@ -194,7 +190,6 @@ model Lga {
   name String
   stateId String @db.ObjectId
   state State @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  stations Station[]
   @@index([name])
 }
 model Station {
@@ -205,8 +200,6 @@ model Station {
   state String
   State State @relation(fields: [state], references: [name], onDelete: Cascade, onUpdate: Cascade)
   lga String
-  lgaId String @db.ObjectId
-  LGA Lga @relation(fields: [lgaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   phoneNumbers String[]
   officeStaff OfficeStaff[]
   tripStaff TripStaff[]
@@ -245,15 +238,13 @@ model Staff {
   phoneNumbers String[] @unique
   gender Gender
   imgUrl String?
-  qualifications String?
   address Address
-  guarantors guarantor[]
+  guarantors SupportPeople
   nextOfKin SupportPeople
   paymentDetails PayRole?
   officeStaffInfo OfficeStaff?
   tripStaffInfo TripStaff?
   expensesRequested Expenses[]
-  dateOfBirth DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FormControl,
   FormField,
@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import { Control } from "react-hook-form";
+import { Control, UseFormGetFieldState } from "react-hook-form";
 
 const FormInput = ({
   control,
@@ -33,7 +33,7 @@ const FormInput = ({
           <FormLabel>{label}</FormLabel>
 
           <FormControl>
-            <div>
+            <div className="relative">
               <Input type={type} {...field} placeholder={placeholder} />
               <span className="text-sm font-light text-gray-700">
                 {message}
