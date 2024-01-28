@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
         const { usernameOrEmail, password } = credentials as any;
         try {
           const { data } = await axios.post(
-            "http://localhost:3000/api/user/login",
+            "http://localhost:3000/api/user/staff/login",
             {
               usernameOrEmail,
               password,

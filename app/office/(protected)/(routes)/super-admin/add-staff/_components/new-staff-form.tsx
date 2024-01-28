@@ -6,8 +6,9 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 import { startTransition, useCallback, useState } from "react";
-import { newUserRegistration } from "@/lib/actions";
+import { newStaffRegistration } from "@/lib/actions";
 import { APIResponseObject } from "@/types";
 import ConfirmPin from "@/components/confirm-pin";
 import {
@@ -121,23 +122,53 @@ const NewStaffForm = () => {
   const doNothing = () => {};
 
   const userRole = userForm.watch("role");
+  
+  const {mutate} = useMutation({
+    mutationFn: async () => {
+    const userInfo = userForm.getValues();
+    let staffInfo = staffForm.getValues();
+    (staffInfo.phoneNumbers as any) = staffInfo.phoneNumbers.split(" ");
+    const nokInfo = nokForm.getValues();
+    const guarantorInfo = guarantorsForm.getValues();
+    const staffTypeInfo = staffTypeForm.getValues();
 
-  // const onSubmit = async (values: z.infer<typeof formSchema>) => {
-  //   startTransition(() => {
-  //     newUserRegistration(values).then((data: APIResponseObject) => {
-  //       if (data.success) {
-  //         toast({
-  //           description: "User created Please Continue with staff details",
-  //         });
-  //         router.push(`/office/super-admin/staff/${data.user.id}`);
-  //       } else
-  //         toast({
-  //           variant: "destructive",
-  //           description: data.message,
-  //         });
-  //     });
-  //   });
-  // };
+    const values = {
+      user: userInfo,
+      staff: {
+        ...staffInfo,
+        nextofKin: nokInfo,
+        guarantors: guarantorInfo,
+        },
+      officeStaffInfo: userRole === "Trip_Staff" ? null : staffTypeInfo,
+      tripStaffInfo: userRole === "Trip_Staff" ? staffTypeInfo : null,
+      };
+    }
+    const data = await newStaffRegistration(values)
+    if (!data.success) throw Error(data.message);
+      return data;
+  })
+
+  const onSubmit = () => {
+    mutate(values, {
+      onSuccess: (data) => {
+        toast({
+          description: data.message,
+        });
+        userForm.reset();
+        staffForm.reset();
+        nokForm.reset();
+        guarantorsForm.reset();
+        tripStatffForm.reset();
+        officeStatffForm.reset();
+      },
+      onError: (error) => {
+        toast({
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  }
   return (
     <div>
       <div className="grid col-1 md:grid-cols-2 gap-6 mt-20">
@@ -155,7 +186,7 @@ const NewStaffForm = () => {
           <OfficeStaffForm form={officeStatffForm} />
         )}
       </div>
-      <ConfirmPin id="user-reg" name="Submit" action={() => ""} />
+      <ConfirmPin id="user-reg" name="Submit" action={} />
       <Button
         type="button"
         onClick={async () => {
@@ -191,24 +222,7 @@ const NewStaffForm = () => {
           await guarantorsForm.handleSubmit(setGuaValid)();
           await staffTypeForm.handleSubmit(setSttyValid)();
           if (userValid && staffValid && nokValid && guaValid && sttyValid) {
-            const userInfo = userForm.getValues();
-            let staffInfo = staffForm.getValues();
-            (staffInfo.phoneNumbers as any) = staffInfo.phoneNumbers.split(" ");
-            const nokInfo = nokForm.getValues();
-            const guarantorInfo = guarantorsForm.getValues();
-            const staffTypeInfo = staffTypeForm.getValues();
-
-            const values = {
-              user: userInfo,
-              staff: {
-                ...staffInfo,
-                nextofKin: nokInfo,
-                guarantors: guarantorInfo,
-              },
-              officeStaffInfo: userRole === "Trip_Staff" ? null : staffTypeInfo,
-              tripStaffInfo: userRole === "Trip_Staff" ? staffTypeInfo : null,
-            };
-            console.log(values);
+            validatePin()
           } else
             console.log(userValid, staffValid, nokValid, guaValid, sttyValid);
         }}

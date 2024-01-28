@@ -4,7 +4,7 @@ import { successResponse } from "@/lib/responses";
 import { errorHandler } from "@/lib/error-handler";
 import * as z from "zod";
 
-const reqObject = z.object({
+const user = z.object({
   userName: z
     .string()
     .min(3, {
@@ -24,7 +24,7 @@ const reqObject = z.object({
 });
 export async function POST(req: Request) {
   try {
-    const user = await req.json();
+    const data:{ user, staff, officeStaffInfo, tripStaffInfo } = await req.json();
     reqObject.parse(user);
     user.password = hashPassword(user.password);
     const createdUser = await db.user.create({ data: user });

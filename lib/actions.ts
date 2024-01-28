@@ -14,10 +14,10 @@ export async function getUser() {
   return user;
 }
 
-export async function newUserRegistration(values: any) {
-  !values.email && delete values.email;
-  delete values.confirmPassword;
-  const res = await fetch(`${api}/user`, {
+export async function newStaffRegistration(values: any) {
+  !values.user.email && delete values.user.email;
+  delete values.user.confirmPassword;
+  const res = await fetch(`${api}/user/staff`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export async function newUserRegistration(values: any) {
 export const addPin = async (values: any) => {
   const user = await getUser();
   delete values.confirmPin;
-  const res = await fetch(`${api}/user/${user.id}/add-pin`, {
+  const res = await fetch(`${api}/user/staff/${user.id}/add-pin`, {
     method: "PATCH",
     body: JSON.stringify({
       ...values,
@@ -52,7 +52,7 @@ export const addPin = async (values: any) => {
 export const changePin = async (values: any) => {
   const user = await getUser();
   delete values.confirmPin;
-  const res = await fetch(`${api}/user/${user.id}/change-pin`, {
+  const res = await fetch(`${api}/user/staff/${user.id}/change-pin`, {
     method: "PATCH",
     body: JSON.stringify({
       ...values,
@@ -68,7 +68,7 @@ export const changePin = async (values: any) => {
 
 export const verifyPin = async (values: any) => {
   const user = await getUser();
-  const res = await fetch(`${api}/user/${user.id}/validate-pin`, {
+  const res = await fetch(`${api}/user/staff/${user.id}/validate-pin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export const verifyPin = async (values: any) => {
 export const changePassword = async (values: any) => {
   const user = await getUser();
   delete values.confirmPassword;
-  const res = await fetch(`${api}/user/${user.id}/change-password`, {
+  const res = await fetch(`${api}/user/staff/${user.id}/change-password`, {
     method: "PATCH",
     body: JSON.stringify({
       ...values,

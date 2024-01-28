@@ -67,7 +67,6 @@ const StationForm = () => {
     (document.getElementById("station-reg") as HTMLDialogElement)?.click();
   };
   const onSubmit = (values: z.infer<typeof stationFormSchema>) => {
-    console.log(values);
 
     mutate(values, {
       onSuccess: (data) => {
