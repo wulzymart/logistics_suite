@@ -20,7 +20,7 @@ import FormInput from "@/components/form-input";
 import { Lga, State } from "@prisma/client";
 import FormTextarea from "@/components/form-textarea";
 import { compare } from "@/lib/utils";
-import GetLGA from "@/hooks/states_lga";
+import { GetStates, Getlgas } from "@/hooks/states_lga";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const staffFormSchema = z.object({
@@ -45,25 +45,18 @@ const StaffInfoForm = ({
       middleName: string | null;
       gender: "" | "male" | "female";
       phoneNumbers: string;
-      qualifications: string | null;
-      dateOfBirth: Date | null;
       state: string;
-      lga: string;
       address: string;
     },
     any,
     undefined
   >;
 }) => {
-  const { isLoading, data, isError } = useQuery({
-    queryKey: ["states_list"],
-    queryFn: async () => {
-      const { data } = await axios.get("/api/states");
-      return data;
-    },
-  });
-
-  const lgas = GetLGA(form.watch("state"));
+  const {
+    isLoading: isLoadingStates,
+    data: statesData,
+    isError: isErrorStates,
+  } = GetStates();
   return (
     <div className="border shadow-sm p-8 rounded-lg w-full">
       <Form {...form}>
@@ -81,7 +74,7 @@ const StaffInfoForm = ({
               name="lastName"
               label="Last Name"
               type="text"
-              placeholder="e.g Jaxk"
+              placeholder="e.g Jack"
             />
           </div>
           <div className="flex w-full gap-4">
@@ -126,13 +119,6 @@ const StaffInfoForm = ({
               name="phoneNumbers"
               placeholder="e.g +2348123456789 +2348081730978"
             />
-            <FormInput
-              control={form.control}
-              name="qualifications"
-              label="Qualifications"
-              type="text"
-              placeholder="e.g OND, BSC..."
-            />
           </div>
           <div className="space-y-4">
             <FormLabel className="mb-4">Address</FormLabel>
@@ -147,62 +133,35 @@ const StaffInfoForm = ({
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                      >
-                        <SelectTrigger
-                          disabled={isError || isLoading || !data.success}
-                          className="w-full"
-                        >
-                          <SelectValue
-                            placeholder="Select State"
-                            className="w-full"
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {!isLoading &&
-                            !isError &&
-                            data.states.sort(compare).map((state: State) => (
-                              <SelectItem key={state.id} value={state.name}>
-                                {state.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lga"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>LGA</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <SelectTrigger
                           disabled={
-                            isError ||
-                            isLoading ||
-                            lgas.isError ||
-                            lgas.isLoading ||
-                            !lgas.data.success
+                            isErrorStates ||
+                            isLoadingStates ||
+                            !statesData.success
                           }
                           className="w-full"
                         >
-                          <SelectValue placeholder="Select LGA" />
+                          {field.value ? (
+                            <SelectValue
+                              placeholder="Select State"
+                              className="w-full"
+                            />
+                          ) : (
+                            "Select State"
+                          )}
                         </SelectTrigger>
                         <SelectContent>
-                          {!lgas.isLoading &&
-                            !lgas.isError &&
-                            lgas.data.lgas.sort(compare).map((lga: Lga) => (
-                              <SelectItem key={lga.id} value={lga.name}>
-                                {lga.name}
-                              </SelectItem>
-                            ))}
+                          {!isLoadingStates &&
+                            !isErrorStates &&
+                            statesData.states
+                              .sort(compare)
+                              .map((state: State) => (
+                                <SelectItem key={state.id} value={state.name}>
+                                  {state.name}
+                                </SelectItem>
+                              ))}
                         </SelectContent>
                       </Select>
                     </FormControl>

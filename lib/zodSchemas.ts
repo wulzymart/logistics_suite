@@ -22,7 +22,16 @@ export const lgaSchema = z.string().min(2, { message: "Please select LGA" });
 export const addressSchema = z
   .string()
   .min(10, { message: "Provide a detailed address" });
+export const stationSchema = z
+  .string()
+  .min(2, { message: "Please select a station" });
 
+export const roleSchema = z
+  .string()
+  .min(2, { message: "Please select a role" });
+export const coverageSchema = z
+  .string()
+  .min(2, { message: "Please select a coverage area" });
 export const fullNameSchema = z
   .string()
   .min(5, { message: "Please provide name and surname" });
@@ -30,7 +39,6 @@ export const genderSchema = z
   .enum(["male", "female", ""])
   .refine((val) => val !== "", {
     message: "select a gender",
-    path: ["gender"],
   });
 
 export const userNameSchema = z
@@ -71,10 +79,7 @@ export const staffFormSchema = z.object({
   middleName: middleNameSchema,
   gender: genderSchema,
   phoneNumbers: ngPhoneNumbersSchema,
-  qualifications: z.string().min(0).nullable(),
-  dateOfBirth: z.date().nullable(),
   state: stateSchema,
-  lga: lgaSchema,
   address: addressSchema,
 });
 export const supportPeopleSchema = z.object({
@@ -82,12 +87,55 @@ export const supportPeopleSchema = z.object({
   phoneNumber: ngPhoneNumberSchema,
   address: addressSchema,
 });
-export const guarantorSchema = z.object({
-  name1: z.union([z.string().length(0), fullNameSchema]),
-  phoneNumber1: z.union([z.string().length(0), ngPhoneNumberSchema]),
-  name2: z.union([z.string().length(0), fullNameSchema]),
-  phoneNumber2: z.union([z.string().length(0), ngPhoneNumberSchema]),
-});
+export const guarantorSchema = z
+  .object({
+    name1: z.union([fullNameSchema, z.string().length(0)]),
+    phoneNumber1: z.union([ngPhoneNumberSchema, z.string().length(0)]),
+    name2: z.union([fullNameSchema, z.string().length(0)]),
+    phoneNumber2: z.union([ngPhoneNumberSchema, z.string().length(0)]),
+  })
+  .refine((data) => (data.name1 ? data.name1 && data.phoneNumber1 : true), {
+    message: "Please provide phone number",
+    path: ["phoneNumber1"],
+  })
+  .refine(
+    (data) => (data.phoneNumber1 ? data.phoneNumber1 && data.name1 : true),
+    {
+      message: "Please provide name",
+      path: ["name1"],
+    }
+  )
+  .refine((data) => (data.name2 ? data.name2 && data.phoneNumber2 : true), {
+    message: "Please provide phone number",
+    path: ["phoneNumber2"],
+  })
+  .refine(
+    (data) => (data.phoneNumber2 ? data.phoneNumber2 && data.name2 : true),
+    {
+      message: "Please provide name",
+      path: ["name2"],
+    }
+  )
+  .refine((data) => (data.name2 ? data.name2 && data.phoneNumber2 : true), {
+    message: "Please provide phone number",
+    path: ["phoneNumber2"],
+  })
+  .refine((data) => (data.name2 ? data.name2 && data.name1 : true), {
+    message: "Please provide gurantor1 details first",
+    path: ["name1"],
+  })
+  .refine((data) => (data.name2 ? data.name2 !== data.name1 : true), {
+    message: "Guarantors must be different",
+    path: ["name2"],
+  })
+  .refine(
+    (data) =>
+      data.phoneNumber2 ? data.phoneNumber2 !== data.phoneNumber1 : true,
+    {
+      message: "Guarantors must be different",
+      path: ["phoneNumber2"],
+    }
+  );
 
 export const stationFormSchema = z.object({
   name: z.string().min(3, { message: "Name is a minimum of 3 characters" }),
@@ -105,9 +153,21 @@ export const salaryInfoSchema = z.object({
   bankName: z.string().min(3, { message: "Please input staff's bank name" }),
   bankAccount: z
     .string()
-    .regex(/^d{}10$/, { message: "account number can only be 10 digits" }),
+    .regex(/^\d{10}$/, { message: "account number can only be 10 digits" }),
   grossSalary: z.number(),
   tax: z.number(),
   pension: z.number(),
   otherDeductions: z.number(),
+});
+
+export const officeStaffSchema = z.object({
+  state: stateSchema,
+  station: stationSchema,
+});
+
+export const tripStaffSchema = z.object({
+  role: roleSchema,
+  coverage: coverageSchema,
+  state: z.union([stateSchema, z.string().length(0)]),
+  station: z.union([stationSchema, z.string().length(0)]),
 });

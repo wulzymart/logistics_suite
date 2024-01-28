@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { startTransition, useState } from "react";
+import { startTransition, useCallback, useState } from "react";
 import { newUserRegistration } from "@/lib/actions";
 import { APIResponseObject } from "@/types";
 import ConfirmPin from "@/components/confirm-pin";
@@ -22,14 +22,17 @@ import NewUserForm from "./user-form";
 import StaffInfoForm from "./staff-form";
 import {
   guarantorSchema,
+  officeStaffSchema,
   salaryInfoSchema,
   staffFormSchema,
   supportPeopleSchema,
+  tripStaffSchema,
   userFormSchema,
 } from "@/lib/zodSchemas";
 import NextOfKinForm from "./next-of-kin-form";
 import GuarantorForm from "./guarantor-form";
-import SalaryInfoForm from "./payment-info-form";
+import TripStaffForm from "./trip-staff-form";
+import OfficeStaffForm from "./office-staff-form";
 
 // type Staff = {
 //   userId: string | null;
@@ -47,6 +50,7 @@ import SalaryInfoForm from "./payment-info-form";
 const roles = ["Trip_Staff", "Staff", "Admin", "Super_Admin", "Developer"];
 
 const NewStaffForm = () => {
+  const [isValid, setIsValid] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -59,6 +63,7 @@ const NewStaffForm = () => {
       confirmPassword: "",
       role: "",
     },
+    mode: "onTouched",
   });
   const staffForm = useForm<z.infer<typeof staffFormSchema>>({
     resolver: zodResolver(staffFormSchema),
@@ -68,12 +73,10 @@ const NewStaffForm = () => {
       middleName: "",
       gender: "",
       phoneNumbers: "",
-      qualifications: "",
-      dateOfBirth: new Date(),
       state: "",
-      lga: "",
       address: "",
     },
+    mode: "onTouched",
   });
   const nokForm = useForm<z.infer<typeof supportPeopleSchema>>({
     resolver: zodResolver(supportPeopleSchema),
@@ -82,30 +85,43 @@ const NewStaffForm = () => {
       phoneNumber: "",
       address: "",
     },
+    mode: "onTouched",
   });
-  const guarantorsForm = useForm<z.infer<typeof guarantorSchema>>({
-    resolver: zodResolver(guarantorSchema),
+  const guarantorsForm = useForm<z.infer<typeof supportPeopleSchema>>({
+    resolver: zodResolver(supportPeopleSchema),
     defaultValues: {
-      name1: "",
-      name2: "",
-      phoneNumber1: "",
-      phoneNumber2: "",
+      name: "",
+      phoneNumber: "",
+      address: "",
     },
+    mode: "onTouched",
   });
-  const salaryForm = useForm<z.infer<typeof salaryInfoSchema>>({
-    resolver: zodResolver(salaryInfoSchema),
+
+  const officeStatffForm = useForm<z.infer<typeof officeStaffSchema>>({
+    resolver: zodResolver(officeStaffSchema),
     defaultValues: {
-      bankAccount: "",
-      bankName: "",
-      grossSalary: 0.0,
-      tax: 0.0,
-      pension: 0.0,
-      otherDeductions: 0.0,
+      state: "",
+      station: "",
     },
+    mode: "onTouched",
+  });
+  const tripStatffForm = useForm<z.infer<typeof tripStaffSchema>>({
+    resolver: zodResolver(officeStaffSchema),
+    defaultValues: {
+      role: "",
+      coverage: "",
+      state: "",
+      station: "",
+    },
+    mode: "onTouched",
   });
   const validatePin = () => {
     document.getElementById("user-reg")?.click();
   };
+  const doNothing = () => {};
+
+  const userRole = userForm.watch("role");
+
   // const onSubmit = async (values: z.infer<typeof formSchema>) => {
   //   startTransition(() => {
   //     newUserRegistration(values).then((data: APIResponseObject) => {
@@ -132,11 +148,71 @@ const NewStaffForm = () => {
         <NextOfKinForm form={nokForm} />
         <GuarantorForm form={guarantorsForm} />
       </div>
-      <div className="grid col-1 md:grid-cols-2 gap-6 mt-20">
-        <SalaryInfoForm form={salaryForm} />
+      <div className="grid col-1 mt-20">
+        {userRole === "Trip_Staff" ? (
+          <TripStaffForm form={tripStatffForm} />
+        ) : (
+          <OfficeStaffForm form={officeStatffForm} />
+        )}
       </div>
       <ConfirmPin id="user-reg" name="Submit" action={() => ""} />
-      <Button type="button" onClick={() => userForm.trigger()}>
+      <Button
+        type="button"
+        onClick={async () => {
+          const staffTypeForm =
+            userRole === "Trip_Staff" ? tripStatffForm : officeStatffForm;
+
+          let userValid = false;
+          const setUserValid = () => {
+            console.log("called");
+
+            userValid = true;
+          };
+          let staffValid = false;
+          const setStaffValid = () => {
+            staffValid = true;
+          };
+          let nokValid = false;
+          const setNokValid = () => {
+            nokValid = true;
+          };
+          let guaValid = false;
+          const setGuaValid = () => {
+            guaValid = true;
+          };
+          let sttyValid = false;
+          const setSttyValid = () => {
+            sttyValid = true;
+          };
+
+          await userForm.handleSubmit(setUserValid)();
+          await staffForm.handleSubmit(setStaffValid)();
+          await nokForm.handleSubmit(setNokValid)();
+          await guarantorsForm.handleSubmit(setGuaValid)();
+          await staffTypeForm.handleSubmit(setSttyValid)();
+          if (userValid && staffValid && nokValid && guaValid && sttyValid) {
+            const userInfo = userForm.getValues();
+            let staffInfo = staffForm.getValues();
+            (staffInfo.phoneNumbers as any) = staffInfo.phoneNumbers.split(" ");
+            const nokInfo = nokForm.getValues();
+            const guarantorInfo = guarantorsForm.getValues();
+            const staffTypeInfo = staffTypeForm.getValues();
+
+            const values = {
+              user: userInfo,
+              staff: {
+                ...staffInfo,
+                nextofKin: nokInfo,
+                guarantors: guarantorInfo,
+              },
+              officeStaffInfo: userRole === "Trip_Staff" ? null : staffTypeInfo,
+              tripStaffInfo: userRole === "Trip_Staff" ? staffTypeInfo : null,
+            };
+            console.log(values);
+          } else
+            console.log(userValid, staffValid, nokValid, guaValid, sttyValid);
+        }}
+      >
         Submit
       </Button>
     </div>
