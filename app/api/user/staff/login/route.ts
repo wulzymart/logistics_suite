@@ -35,10 +35,38 @@ export async function POST(req: Request) {
             where: {
               email: loginData.usernameOrEmail,
             },
+            include: {
+              staffDetails: {
+                include: {
+                  officeStaffInfo: {
+                    include: {
+                      station: true,
+                    },
+                  },
+                  tripStaffInfo: {
+                    include: { station: true },
+                  },
+                },
+              },
+            },
           })
         : await db.user.findUnique({
             where: {
               userName: loginData.usernameOrEmail,
+            },
+            include: {
+              staffDetails: {
+                include: {
+                  officeStaffInfo: {
+                    include: {
+                      station: true,
+                    },
+                  },
+                  tripStaffInfo: {
+                    include: { station: true },
+                  },
+                },
+              },
             },
           });
     if (!user || !validatePassword(loginData.password, user.password))

@@ -1,13 +1,16 @@
 import React from "react";
-import HailIcon from "@mui/icons-material/Hail";
-import SpeedIcon from "@mui/icons-material/Speed";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
-import MopedIcon from "@mui/icons-material/Moped";
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+
 import Link from "next/link";
-import { Handshake } from "@mui/icons-material";
+import {
+  AirportShuttle,
+  FitnessCenter,
+  Hail,
+  Handshake,
+  LocalShipping,
+  Moped,
+  RequestQuote,
+  Speed,
+} from "@mui/icons-material";
 
 const Services = () => {
   return (
@@ -31,7 +34,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <HailIcon fontSize="inherit" />
+                <Hail fontSize="inherit" />
               </span>
               <h2 className="font-bold  mb-5 text-xl">Pick Up</h2>
               <p className="text-sm  ">
@@ -44,7 +47,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <LocalShippingIcon fontSize="inherit" />
+                <LocalShipping fontSize="inherit" />
               </span>
               <h2 className="font-bold  mb-5 text-xl">Haulage</h2>
               <p className="text-sm ">
@@ -57,7 +60,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <AirportShuttleIcon fontSize="inherit" />
+                <AirportShuttle fontSize="inherit" />
               </span>
               <h2 className="font-bold  mb-5 text-xl">On-time Delivery</h2>
               <p className="text-sm ">
@@ -69,7 +72,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <SpeedIcon fontSize="inherit" />
+                <Speed fontSize="inherit" />
               </span>
               <h2 className="font-bold   mb-5 text-xl">Express Shipment</h2>
               <p className="text-sm  ">
@@ -97,7 +100,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <MopedIcon fontSize="inherit" />
+                <Moped fontSize="inherit" />
               </span>
               <h2 className="font-bold  mb-5 text-xl">Last Man Delivery</h2>
               <p className="text-sm ">
@@ -110,7 +113,7 @@ const Services = () => {
               className="text-center cursor-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <FitnessCenterIcon fontSize="inherit" />
+                <FitnessCenter fontSize="inherit" />
               </span>
               <h2 className="font-bold mb-5 text-xl">Loading & Offloading </h2>
               <p className="text-sm">
@@ -124,7 +127,7 @@ const Services = () => {
               className="text-center cursur-pointer lg:text-left relative overflow-hidden border border-gray-300 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 py-12 px-8 bg-white hover:bg-blue-900 hover:text-white text-gray-800 hover:-translate-y-4 hover:transition/home/mart/Documents/fll-website/src/components/Steps.jsx"
             >
               <span className="inline-flex mb-6 text-5xl">
-                <RequestQuoteIcon fontSize="inherit" />
+                <RequestQuote fontSize="inherit" />
               </span>
               <h2 className="font-semibold  mb-5 text-xl">Get a Quick Quote</h2>
               <p className="text-sm ">Get a cost estimate for shipments.</p>

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { errorHandler } from "@/lib/error-handler";
 import { successResponse } from "@/lib/responses";
+import { ngPhoneNumberSchema } from "@/lib/zodSchemas";
 import * as z from "zod";
 
 const stationSchema = z.object({
@@ -13,9 +14,7 @@ const stationSchema = z.object({
   lga: z.string().min(2, { message: "Please select a LGA" }),
   address: z.string().min(10, { message: "Provide a detailed street address" }),
   phoneNumbers: z
-    .array(
-      z.string().min(10, { message: "Please Provide valid phone numbers" })
-    )
+    .array(ngPhoneNumberSchema)
     .min(1, { message: "there must be atleast 1 phone number" }),
 });
 export async function POST(req: Request) {

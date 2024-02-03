@@ -34,6 +34,7 @@ import NextOfKinForm from "./next-of-kin-form";
 import GuarantorForm from "./guarantor-form";
 import TripStaffForm from "./trip-staff-form";
 import OfficeStaffForm from "./office-staff-form";
+import { Variable } from "lucide-react";
 
 // type Staff = {
 //   userId: string | null;
@@ -119,37 +120,38 @@ const NewStaffForm = () => {
   const validatePin = () => {
     document.getElementById("user-reg")?.click();
   };
-  const doNothing = () => {};
 
   const userRole = userForm.watch("role");
-  
-  const {mutate} = useMutation({
-    mutationFn: async () => {
-    const userInfo = userForm.getValues();
-    let staffInfo = staffForm.getValues();
-    (staffInfo.phoneNumbers as any) = staffInfo.phoneNumbers.split(" ");
-    const nokInfo = nokForm.getValues();
-    const guarantorInfo = guarantorsForm.getValues();
-    const staffTypeInfo = staffTypeForm.getValues();
 
-    const values = {
-      user: userInfo,
-      staff: {
-        ...staffInfo,
-        nextofKin: nokInfo,
-        guarantors: guarantorInfo,
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      const staffTypeForm =
+        userRole === "Trip_Staff" ? tripStatffForm : officeStatffForm;
+      const userInfo = userForm.getValues();
+      let staffInfo = staffForm.getValues();
+      (staffInfo.phoneNumbers as any) = staffInfo.phoneNumbers.split(" ");
+      const nokInfo = nokForm.getValues();
+      const guarantorInfo = guarantorsForm.getValues();
+      const staffTypeInfo = staffTypeForm.getValues();
+
+      const values = {
+        user: userInfo,
+        staff: {
+          ...staffInfo,
+          nextofKin: nokInfo,
+          guarantor: guarantorInfo,
         },
-      officeStaffInfo: userRole === "Trip_Staff" ? null : staffTypeInfo,
-      tripStaffInfo: userRole === "Trip_Staff" ? staffTypeInfo : null,
+        officeStaffInfo: userRole === "Trip_Staff" ? null : staffTypeInfo,
+        tripStaffInfo: userRole === "Trip_Staff" ? staffTypeInfo : null,
       };
-    }
-    const data = await newStaffRegistration(values)
-    if (!data.success) throw Error(data.message);
+      const data = await newStaffRegistration(values);
+      if (!data.success) throw Error(data.message);
       return data;
-  })
+    },
+  });
 
   const onSubmit = () => {
-    mutate(values, {
+    mutate(undefined, {
       onSuccess: (data) => {
         toast({
           description: data.message,
@@ -168,7 +170,7 @@ const NewStaffForm = () => {
         });
       },
     });
-  }
+  };
   return (
     <div>
       <div className="grid col-1 md:grid-cols-2 gap-6 mt-20">
@@ -186,7 +188,7 @@ const NewStaffForm = () => {
           <OfficeStaffForm form={officeStatffForm} />
         )}
       </div>
-      <ConfirmPin id="user-reg" name="Submit" action={} />
+      <ConfirmPin id="user-reg" name="Submit" action={onSubmit} />
       <Button
         type="button"
         onClick={async () => {
@@ -222,7 +224,7 @@ const NewStaffForm = () => {
           await guarantorsForm.handleSubmit(setGuaValid)();
           await staffTypeForm.handleSubmit(setSttyValid)();
           if (userValid && staffValid && nokValid && guaValid && sttyValid) {
-            validatePin()
+            validatePin();
           } else
             console.log(userValid, staffValid, nokValid, guaValid, sttyValid);
         }}

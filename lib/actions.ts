@@ -3,6 +3,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/option";
 import { getServerSession } from "next-auth";
 import { revalidateTag } from "next/cache";
+import { NestedMiddlewareError } from "next/dist/build/utils";
 import { redirect } from "next/navigation";
 
 const api = process.env.API;
@@ -11,6 +12,8 @@ export async function getUser() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) return redirect("/office/login");
   const { user } = session;
+  console.log(user);
+
   return user;
 }
 
@@ -142,4 +145,26 @@ export const getStations = async () => {
     next: { tags: [`stations_list`] },
   });
   return res.json();
+};
+
+export const addCustomer = async (values: any) => {
+  const user = await getUser();
+  const info = `created by ${user.name} of ${user.staffDetails.officeStaffInfo.stationName}`;
+  values.history = [{ info, time: new Date().toISOString() }];
+  values.customerType = "Individual";
+  const res = await fetch(`${api}/customers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+    cache: "no-cache",
+  });
+
+  return await res.json();
+};
+
+export const getCustomer = async (phoneOrId: string) => {
+  const res = await fetch(`${api}/customers/${phoneOrId}`);
+  return await res.json();
 };

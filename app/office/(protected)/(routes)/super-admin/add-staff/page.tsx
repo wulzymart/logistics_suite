@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Title from "@/components/app_title";
 import NewStaffForm from "./_components/new-staff-form";
+import AddCustomerForm from "../../new-waybill/add-customer/_components/add-customer-form";
 
 const NewStaffPage = async () => {
   return (

@@ -11,9 +11,10 @@ const Pin = async () => {
 
   if (!session || !session.user) return redirect("/office/login");
   const { user } = session;
+  console.log(user);
 
   const res = await fetch(
-    `http://localhost:3000/api/user/${user.id}/check-pin-state`,
+    `${process.env.API}/user/staff/${user.id}/check-pin-state`,
     { next: { tags: ["pin-status"] } }
   );
 

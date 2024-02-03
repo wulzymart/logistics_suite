@@ -2,10 +2,10 @@ import * as z from "zod";
 
 export const ngPhoneNumbersSchema = z
   .string()
-  .regex(/^(?:\+234|0)\d{10}(\s+(?:\+234|0)\d{10})*$/, {
+  .regex(/^(?:\+234)\d{10}(\s+(?:\+234)\d{10})*$/, {
     message: "please input valid phone numbers",
   });
-export const ngPhoneNumberSchema = z.string().regex(/^(?:\+234|0)\d{10}$/, {
+export const ngPhoneNumberSchema = z.string().regex(/^(?:\+234)\d{10}$/, {
   message: "please input a valid phone number",
 });
 export const firstNameSchema = z
@@ -170,4 +170,15 @@ export const tripStaffSchema = z.object({
   coverage: coverageSchema,
   state: z.union([stateSchema, z.string().length(0)]),
   station: z.union([stationSchema, z.string().length(0)]),
+});
+
+export const newCustomerShema = z.object({
+  firstName: firstNameSchema,
+  lastName: lastNameSchema,
+  email: emailSchema,
+  phoneNumber: ngPhoneNumberSchema,
+  address: z.object({
+    state: stateSchema,
+    streetAddress: addressSchema,
+  }),
 });

@@ -1,7 +1,10 @@
 import React from "react";
-import DescriptionIcon from "@mui/icons-material/Description";
-import ShareLocationIcon from "@mui/icons-material/ShareLocation";
-import { DeliveryDining, Handshake } from "@mui/icons-material";
+import {
+  DeliveryDining,
+  Description,
+  Handshake,
+  ShareLocation,
+} from "@mui/icons-material";
 
 const Steps = () => {
   return (
@@ -27,7 +30,7 @@ const Steps = () => {
           </div>
           <div className="w-full sm:w-1/2 lg:w-1/4 p-5 flex flex-col text-center justify-center items-center gap-3">
             <span className="text-5xl text-center">
-              <DescriptionIcon fontSize="inherit" />
+              <Description fontSize="inherit" />
             </span>
 
             <h3 className="mb-2 text-xl font-bold dark:text-white">
@@ -39,7 +42,7 @@ const Steps = () => {
           </div>
           <div className="w-full sm:w-1/2 lg:w-1/4 p-5 flex flex-col text-center justify-center items-center gap-3">
             <span className="text-5xl text-center">
-              <ShareLocationIcon fontSize="inherit" />
+              <ShareLocation fontSize="inherit" />
             </span>
 
             <h3 className="mb-2 text-xl font-bold dark:text-white">

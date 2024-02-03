@@ -1,7 +1,14 @@
 import { Roles } from "@prisma/client";
 import {
+  ClipboardCopyIcon,
+  ClipboardIcon,
+  ClipboardPasteIcon,
   LayoutDashboard,
   LucideIcon,
+  LucideReceipt,
+  Receipt,
+  ReceiptIcon,
+  SquareUser,
   User,
   UserRoundPlus,
   Warehouse,
@@ -26,6 +33,17 @@ export const routes: MenuEntities[] = [
     routes: [
       { title: "Dashboard", href: root, Icon: LayoutDashboard },
       { title: "Profile", href: `${root}/staff/profile`, Icon: User },
+    ],
+  },
+  {
+    name: "Operations",
+    allowedRoles: ["Admin", "Developer", "Super_Admin", "Staff"],
+    routes: [
+      {
+        title: "New Waybill",
+        href: `${root}/new-waybill`,
+        Icon: ClipboardPasteIcon,
+      },
     ],
   },
   {

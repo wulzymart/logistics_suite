@@ -1,3 +1,4 @@
+import { staffFormSchema } from "@/lib/zodSchemas";
 import { User } from "@prisma/client";
 import axios from "axios";
 import { NextAuthOptions } from "next-auth";
@@ -18,7 +19,7 @@ export const authOptions: NextAuthOptions = {
         const { usernameOrEmail, password } = credentials as any;
         try {
           const { data } = await axios.post(
-            "http://localhost:3000/api/user/staff/login",
+            `${process.env.API}/user/staff/login`,
             {
               usernameOrEmail,
               password,
@@ -34,18 +35,20 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     jwt: async ({ token, user }) => {
       if (user) {
-        token.uid = user.id;
-        token.userName = (user as User).userName;
-        token.role = (user as User).role;
+        token.user = user;
       }
 
       return token;
     },
     session: async ({ session, token }) => {
       if (session && session.user) {
-        session.user.id = token.uid as string;
-        session.user.userName = token.userName as string;
-        session.user.role = token.role as string;
+        const { user }: { [key: string]: any } = token;
+        session.user = {
+          ...session.user,
+          name: `${user.staffDetails.firstName} ${user.staffDetails.lastName}`,
+          image: user.staffDetails.imgUrl,
+          ...user,
+        };
       }
       return session;
     },
