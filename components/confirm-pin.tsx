@@ -32,7 +32,7 @@ const ConfirmPin = ({
   action,
 }: {
   id: string;
-  name: string;
+  name?: string;
   action: (...args: any) => any;
 }) => {
   const { toast } = useToast();
@@ -62,8 +62,8 @@ const ConfirmPin = ({
   return (
     <Dialog>
       <DialogTrigger className="hidden" id={id} asChild>
-        <Button variant="ghost" size="sm">
-          {name}
+        <Button variant="ghost" type="button" size="sm">
+          {name || ""}
         </Button>
       </DialogTrigger>
 

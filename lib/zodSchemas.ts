@@ -1,3 +1,4 @@
+import { DeliveryTypeOptions } from "@prisma/client";
 import * as z from "zod";
 
 export const ngPhoneNumbersSchema = z
@@ -181,4 +182,82 @@ export const newCustomerShema = z.object({
     state: stateSchema,
     streetAddress: addressSchema,
   }),
+});
+
+export const orderSchema = z
+  .object({
+    deliveryArea: z
+      .enum(["local", "intrastate", "interstate", ""])
+      .refine((data) => data != "", {
+        message: "Please select a delevery area",
+      }),
+    serviceType: z
+      .enum(["Regular", "Express", ""])
+      .refine((data) => data != "", {
+        message: "Please select a service type",
+      }),
+    deliveryType: z
+      .enum([
+        "station_to_door",
+        "station_to_station",
+        "pickup_to_station",
+        "pickup_to_door",
+        "",
+      ])
+      .refine((data) => data != "", {
+        message: "Please select a delivery type",
+      }),
+    originStation: stationSchema,
+    destinationStation: z.union([stateSchema, z.string().min(0)]),
+    receiver: z.object({
+      firstName: firstNameSchema,
+      lastName: lastNameSchema,
+      phoneNumber: ngPhoneNumberSchema,
+      address: z.object({
+        state: stateSchema,
+        address: addressSchema,
+      }),
+    }),
+    item: z.object({
+      category: z.string().min(2, { message: "Select a category" }),
+      type: z.string(),
+      condition: z.string().min(2, { message: "Cartegory is required" }),
+      description: z
+        .string()
+        .min(10, { message: "Provide a detailed descriptions" }),
+      quantity: z.number(),
+      value: z.number(),
+      weight: z.number(),
+    }),
+    charges: z.object({
+      freightPrice: z.number(),
+      additionalService: z
+        .array(z.object({ name: z.string(), price: z.number() }))
+        .min(0),
+      totalAdditionalService: z.number(),
+      VAT: z.number(),
+      subTotal: z.number(),
+      Total: z.number(),
+    }),
+  })
+  .refine(
+    (data) => {
+      data.deliveryArea !== "local" && data.destinationStation !== "";
+    },
+    { message: "Please provide a station" }
+  );
+
+export const itemTypeSchema = z.object({
+  name: z.string().min(2, { message: "Please provide a name" }),
+  priceFactor: z.number(),
+});
+export const remTypeSchema = z.object({
+  name: z.string().min(2, { message: "Please provide a name" }),
+});
+export const shipmentTypeSchema = z.object({
+  name: z.string().min(2, { message: "Please provide a name" }),
+  price: z.number(),
+  ppw: z.number(),
+  minWeight: z.number(),
+  maxWeight: z.number(),
 });

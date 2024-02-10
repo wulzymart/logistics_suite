@@ -34,7 +34,18 @@ const FormInput = ({
 
           <FormControl>
             <div className="relative">
-              <Input type={type} {...field} placeholder={placeholder} />
+              <Input
+                type={type}
+                {...field}
+                onChange={(e) =>
+                  field.onChange(
+                    type === "number"
+                      ? +e.currentTarget.value
+                      : e.currentTarget.value
+                  )
+                }
+                placeholder={placeholder}
+              />
               <span className="text-sm font-light text-gray-700">
                 {message}
               </span>

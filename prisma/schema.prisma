@@ -51,6 +51,7 @@ type SalaryScheme {
 // @orders usage
 type Item {
   category    String
+  type        String
   condition   String
   description String
   quantity    Int
@@ -62,7 +63,7 @@ type ReceiverInfo {
   firstName   String
   lastName    String
   phoneNumber String
-  address     AddressWithLGA
+  address     Address
 }
 
 // payments
@@ -117,10 +118,16 @@ enum CustomerType {
 
 // orders
 enum DeliveryTypeOptions {
-  SD           @map("Station to Delivery man")
-  Interstation
-  PS           @map("Pickup to Station")
-  PD           @map("Pickup to Delivery man")
+  station_to_door
+  station_to_station
+  pickup_to_station
+  pickup_to_door
+}
+
+enum DeliveryZoneOptions {
+  local
+  intrastate
+  interstate
 }
 
 enum ServiceTypeOptions {
@@ -242,7 +249,7 @@ model User {
   customerId   String?    @db.ObjectId
   eCommerce    ECommerce?
 }
-
+ 
 model Staff {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
   userId            String?       @unique @db.ObjectId
@@ -328,6 +335,20 @@ model ECommerce {
   businessRegNo String   @unique
   walletBalance Float    @default(0)
 }
+model ShipmentType {
+  id                 String                @id @default(auto()) @map("_id") @db.ObjectId
+  name               String                @unique
+  price              Float?
+  ppw                Float?
+  minWeight          Float?
+  maxWeight          Float?
+}
+
+model ItemType {
+  id                 String                @id @default(auto()) @map("_id") @db.ObjectId
+  name               String                @unique
+  priceFactor        Float                 @default(1)
+}
 
 model Order {
   id                 String                @id @default(auto()) @map("_id") @db.ObjectId
@@ -337,12 +358,13 @@ model Order {
   receiver           ReceiverInfo
   originStation      String
   OriginStation      Station               @relation("origin station", fields: [originStation], references: [name])
-  isLocalOrder       Boolean               @default(false)
-  deliveryService    ServiceTypeOptions
+  deliveryArea       DeliveryZoneOptions
+  serviceType        ServiceTypeOptions
   deliveryType       DeliveryTypeOptions
   deliveryStatus     DeliveryStatusOptions @default(Recieved)
-  destinationStation String
-  DestinationStation Station               @relation("destination station", fields: [destinationStation], references: [name])
+  destinationStation String?
+  DestinationStation Station?               @relation("destination station", fields: [destinationStation], references: [name])
+  item               Item
   charges            Price
   paid               Boolean               @default(false)
   payOnDelevery      PayOnDeliveryOptions  @default(No)

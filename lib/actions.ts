@@ -100,8 +100,6 @@ export const changePassword = async (values: any) => {
 };
 
 export const addStation = async (values: any) => {
-  console.log("addStation", values);
-
   values.phoneNumbers = values.phoneNumbers.split(" ");
   const res = await fetch(`${api}/stations`, {
     method: "POST",
@@ -165,6 +163,35 @@ export const addCustomer = async (values: any) => {
 };
 
 export const getCustomer = async (phoneOrId: string) => {
-  const res = await fetch(`${api}/customers/${phoneOrId}`);
+  const res = await fetch(`${api}/customers/${phoneOrId}`, {
+    cache: "no-cache",
+  });
+  return await res.json();
+};
+
+export const addItemType = async (values: any) => {
+  console.log(values);
+
+  const res = await fetch(`${api}/item-types`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+    cache: "no-cache",
+  });
+  if (res.ok) revalidateTag("item-types");
+  return await res.json();
+};
+export const getItemTypes = async () => {
+  const res = await fetch(`${api}/item-types`, {
+    next: {
+      tags: ["item-types"],
+    },
+  });
+  return await res.json();
+};
+export const delItemType = async (name: string) => {
+  const res = await fetch(`${api}/item-types/${name}`);
+  if (res.ok) revalidateTag("item-types");
   return await res.json();
 };
