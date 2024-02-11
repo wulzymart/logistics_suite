@@ -170,9 +170,8 @@ export const getCustomer = async (phoneOrId: string) => {
 };
 
 export const addItemType = async (values: any) => {
-  console.log(values);
-
   const res = await fetch(`${api}/item-types`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -191,7 +190,13 @@ export const getItemTypes = async () => {
   return await res.json();
 };
 export const delItemType = async (name: string) => {
-  const res = await fetch(`${api}/item-types/${name}`);
+  const res = await fetch(`${api}/item-types/${name}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-cache",
+  });
   if (res.ok) revalidateTag("item-types");
   return await res.json();
 };

@@ -8,24 +8,28 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { GetItemTypes } from "@/hooks/item-types";
-import { addItemType } from "@/lib/actions";
+import { addItemType, delItemType } from "@/lib/actions";
+import { compare } from "@/lib/utils";
 import { remTypeSchema } from "@/lib/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ItemType } from "@prisma/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const RemItemType = () => {
-  const {} = GetItemTypes;
+  const { isLoading, isError, data } = GetItemTypes();
   const form = useForm<z.infer<typeof remTypeSchema>>({
     resolver: zodResolver(remTypeSchema),
     defaultValues: {
@@ -33,11 +37,11 @@ const RemItemType = () => {
     },
   });
   const validatePin = () => {
-    document.getElementById("submit-item-type")?.click();
+    document.getElementById("del-item-type")?.click();
   };
   const { mutate } = useMutation({
     mutationKey: ["item-types"],
-    mutationFn: async () => await addItemType(form.getValues()),
+    mutationFn: async () => await delItemType(form.getValues().name),
   });
   const onSubmit = () => {
     mutate(undefined, {
@@ -60,12 +64,10 @@ const RemItemType = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(validatePin)}
-          className="w-full space-y-6"
+          className=" border shadow-sm p-8 rounded-lg w-full space-y-6"
         >
-          <FormLabel>Add item type</FormLabel>
-          <div
-            className={`border shadow-sm p-8 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-6`}
-          >
+          <FormLabel>Remove item type</FormLabel>
+          <div className={`grid grid-cols-1 gap-6`}>
             <FormField
               control={form.control}
               name="name"
@@ -89,13 +91,16 @@ const RemItemType = () => {
                         )}
                       </SelectTrigger>
                       <SelectContent>
-                        {!isLoadingStates &&
-                          !isErrorStates &&
-                          statesData.states
+                        {!isLoading &&
+                          !isError &&
+                          data.itemTypes
                             .sort(compare)
-                            .map((state: State) => (
-                              <SelectItem key={state.id} value={state.name}>
-                                {state.name}
+                            .map((itemType: ItemType) => (
+                              <SelectItem
+                                key={itemType.id}
+                                value={itemType.name}
+                              >
+                                {itemType.name}
                               </SelectItem>
                             ))}
                       </SelectContent>
@@ -105,8 +110,8 @@ const RemItemType = () => {
                 </FormItem>
               )}
             />
-            <ConfirmPin id="submit-item-type" action={onSubmit} />
-            <Button type="submit">Add {form.watch("name")}</Button>
+            <ConfirmPin id="del-item-type" action={onSubmit} />
+            <Button type="submit">Remove {form.watch("name")}</Button>
           </div>
         </form>
       </Form>
