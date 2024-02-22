@@ -221,7 +221,7 @@ export const orderSchema = z
     item: z.object({
       category: z.string().min(2, { message: "Select a category" }),
       type: z.string(),
-      condition: z.string().min(2, { message: "Cartegory is required" }),
+      condition: z.string().min(2, { message: "Select approprate condition" }),
       description: z
         .string()
         .min(10, { message: "Provide a detailed descriptions" }),
@@ -236,6 +236,7 @@ export const orderSchema = z
         .min(0),
       totalAdditionalService: z.number(),
       VAT: z.number(),
+      insurance: z.number(),
       subTotal: z.number(),
       Total: z.number(),
     }),
@@ -260,4 +261,8 @@ export const shipmentTypeSchema = z.object({
   ppw: z.number(),
   minWeight: z.number(),
   maxWeight: z.number(),
+});
+
+export const additionalChargeSchema = z.object({
+  name: z.string().min(2, { message: "Please provide a name" }),
 });

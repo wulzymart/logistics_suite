@@ -17,7 +17,7 @@ const FormInput = ({
   placeholder,
   message,
 }: {
-  control: Control<any>;
+  control?: Control<any>;
   name: string;
   label: string;
   type?: string;

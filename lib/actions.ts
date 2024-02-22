@@ -200,3 +200,69 @@ export const delItemType = async (name: string) => {
   if (res.ok) revalidateTag("item-types");
   return await res.json();
 };
+
+export const addShipmentType = async (values: any) => {
+  const res = await fetch(`${api}/shipment-types`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+    cache: "no-cache",
+  });
+  if (res.ok) revalidateTag("shipment-types");
+  return await res.json();
+};
+export const getShipmentTypes = async () => {
+  const res = await fetch(`${api}/shipment-types`, {
+    next: {
+      tags: ["shipment-types"],
+    },
+  });
+  return await res.json();
+};
+export const delShipmentType = async (name: string) => {
+  const res = await fetch(`${api}/shipment-types/${name}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-cache",
+  });
+  if (res.ok) revalidateTag("shipment-types");
+  return await res.json();
+};
+
+export const addAdditionalCharge = async (values: any) => {
+  console.log(values);
+
+  const res = await fetch(`${api}/additional-charges`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+    cache: "no-cache",
+  });
+  if (res.ok) revalidateTag("additional-charges");
+  return await res.json();
+};
+export const getAdditionalCharges = async () => {
+  const res = await fetch(`${api}/additional-charges`, {
+    next: {
+      tags: ["additional-charges"],
+    },
+  });
+  return await res.json();
+};
+export const delAdditionalCharge = async (name: string) => {
+  const res = await fetch(`${api}/additional-charges/${name}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-cache",
+  });
+  if (res.ok) revalidateTag("additional-charges");
+  return await res.json();
+};

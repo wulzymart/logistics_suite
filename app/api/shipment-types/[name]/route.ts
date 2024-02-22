@@ -11,13 +11,13 @@ export async function DELETE(
   }
 ) {
   try {
-    const itemType = await db.itemType.delete({
+    const shipmentType = await db.shipmentType.delete({
       where: {
         name,
       },
     });
 
-    if (!itemType) return notFoundResponse("item type");
+    if (!shipmentType) return notFoundResponse("item type");
     return successResponse("deleted", true);
   } catch (error) {
     return errorHandler(error);

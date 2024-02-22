@@ -1,18 +1,20 @@
 import { db } from "@/lib/db";
 import { errorHandler } from "@/lib/error-handler";
 import { successResponse } from "@/lib/responses";
-import { itemTypeSchema } from "@/lib/zodSchemas";
+import { shipmentTypeSchema } from "@/lib/zodSchemas";
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    console.log(data);
-
-    itemTypeSchema.parse(data);
-    const newItemType = await db.itemType.create({
+    shipmentTypeSchema.parse(data);
+    const newShipmentType = await db.shipmentType.create({
       data,
     });
-    return successResponse("itemType", newItemType, "New item type added");
+    return successResponse(
+      "shipmentType",
+      newShipmentType,
+      "New shipment type added"
+    );
   } catch (error) {
     return errorHandler(error);
   }
@@ -20,8 +22,8 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const itemTypes = await db.itemType.findMany();
-    return successResponse("itemTypes", itemTypes);
+    const shipmentTypes = await db.shipmentType.findMany();
+    return successResponse("shipmentTypes", shipmentTypes);
   } catch (error) {
     return errorHandler(error);
   }

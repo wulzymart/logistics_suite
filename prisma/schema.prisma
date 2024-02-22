@@ -77,6 +77,7 @@ type Price {
   additionalService      AddedServiceType[]
   totalAdditionalService Float
   VAT                    Float
+  insurance              Float
   subTotal               Float
   Total                  Float
 }
@@ -231,7 +232,7 @@ model Station {
   localTrips        LocalTrip[]
   vehicles          Vehicle[]
   Payments          Payment[]
-  expenses          Expenses[]
+  expenses          Expense[]
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 }
@@ -266,7 +267,7 @@ model Staff {
   paymentDetails    PayRole?
   officeStaffInfo   OfficeStaff?
   tripStaffInfo     TripStaff?
-  expensesRequested Expenses[]
+  expensesRequested Expense[]
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }
@@ -348,6 +349,11 @@ model ItemType {
   id                 String                @id @default(auto()) @map("_id") @db.ObjectId
   name               String                @unique
   priceFactor        Float                 @default(1)
+}
+
+model AdditonalCharge {
+  id                 String                @id @default(auto()) @map("_id") @db.ObjectId
+  name               String                @unique
 }
 
 model Order {
@@ -481,7 +487,7 @@ model Review {
   updatedAt   DateTime  @updatedAt
 }
 
-model Expenses {
+model Expense {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   purpose     Purposes
   amount      Float
@@ -495,4 +501,11 @@ model Expenses {
   stationId   String   @db.ObjectId
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Config {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  vat         Float
+  insuranceFactor   Float
+  hq          String
 }
