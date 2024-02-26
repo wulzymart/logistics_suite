@@ -579,17 +579,16 @@ const NewOrderForm = () => {
                   <div className="w-full grid grid-cols-1 md:grid-cols-2 items-end gap-4">
                     <FormField
                       name={`charges.additionalService.${index}.name`}
-                      render={({ field }) => (
+                      render={({ field: f }) => (
                         <FormItem className="w-full">
                           <FormControl>
                             <Select
-                              onValueChange={field.onChange}
-                              onOpenChange={}
-                              defaultValue={field.value}
-                              value={field.value}
+                              onValueChange={f.onChange}
+                              defaultValue={f.value}
+                              value={f.value}
                             >
                               <SelectTrigger className="w-full">
-                                {field.value ? (
+                                {f.value ? (
                                   <SelectValue
                                     placeholder="Select charge"
                                     className="w-full"
@@ -602,12 +601,6 @@ const NewOrderForm = () => {
                                 {!isLoadingAddCharges &&
                                   !isErrorAddCharges &&
                                   addChargesData.additionalCharges
-                                    .filter(
-                                      (charge: AdditonalCharge) =>
-                                        !selectedAdditionalCharge.includes(
-                                          charge.name
-                                        )
-                                    )
                                     .sort(compare)
                                     .map(
                                       (additionalCharge: AdditonalCharge) => (
@@ -636,8 +629,6 @@ const NewOrderForm = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      console.log(field);
-
                       remove(index);
                     }}
                     type="button"
