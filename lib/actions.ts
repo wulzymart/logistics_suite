@@ -1,103 +1,12 @@
 "use server";
 
-import { authOptions } from "@/app/api/auth/[...nextauth]/option";
-import { getServerSession } from "next-auth";
+// import { authOptions } from "@/app/api/auth/[...nextauth]/option";
+// import { getServerSession } from "next-auth";
 import { revalidateTag } from "next/cache";
 import { NestedMiddlewareError } from "next/dist/build/utils";
 import { redirect } from "next/navigation";
 
 const api = process.env.API;
-
-export async function getUser() {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return redirect("/office/login");
-  const { user } = session;
-  console.log(user);
-
-  return user;
-}
-
-export async function newStaffRegistration(values: any) {
-  !values.user.email && delete values.user.email;
-  delete values.user.confirmPassword;
-  const res = await fetch(`${api}/user/staff`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-  });
-
-  return await res.json();
-}
-
-export const addPin = async (values: any) => {
-  const user = await getUser();
-  delete values.confirmPin;
-  const res = await fetch(`${api}/user/staff/${user.id}/add-pin`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      ...values,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-  if (res.ok) {
-    revalidateTag("pin-status");
-    return await res.json();
-  } else {
-    return await res.json();
-  }
-};
-
-export const changePin = async (values: any) => {
-  const user = await getUser();
-  delete values.confirmPin;
-  const res = await fetch(`${api}/user/staff/${user.id}/change-pin`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      ...values,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-
-  return await res.json();
-};
-
-export const verifyPin = async (values: any) => {
-  const user = await getUser();
-  const res = await fetch(`${api}/user/staff/${user.id}/validate-pin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-    cache: "no-cache",
-  });
-
-  return await res.json();
-};
-
-export const changePassword = async (values: any) => {
-  const user = await getUser();
-  delete values.confirmPassword;
-  const res = await fetch(`${api}/user/staff/${user.id}/change-password`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      ...values,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-  return await res.json();
-};
 
 export const addStation = async (values: any) => {
   values.phoneNumbers = values.phoneNumbers.split(" ");
@@ -145,22 +54,6 @@ export const getStations = async () => {
   return res.json();
 };
 
-export const addCustomer = async (values: any) => {
-  const user = await getUser();
-  const info = `created by ${user.name} of ${user.staffDetails.officeStaffInfo.stationName}`;
-  values.history = [{ info, time: new Date().toISOString() }];
-  values.customerType = "Individual";
-  const res = await fetch(`${api}/customers`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-    cache: "no-cache",
-  });
-
-  return await res.json();
-};
 
 export const getCustomer = async (phoneOrId: string) => {
   const res = await fetch(`${api}/customers/${phoneOrId}`, {
@@ -169,18 +62,6 @@ export const getCustomer = async (phoneOrId: string) => {
   return await res.json();
 };
 
-export const addItemType = async (values: any) => {
-  const res = await fetch(`${api}/item-types`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("item-types");
-  return await res.json();
-};
 export const getItemTypes = async () => {
   const res = await fetch(`${api}/item-types`, {
     next: {
@@ -189,80 +70,12 @@ export const getItemTypes = async () => {
   });
   return await res.json();
 };
-export const delItemType = async (name: string) => {
-  const res = await fetch(`${api}/item-types/${name}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("item-types");
-  return await res.json();
-};
 
-export const addShipmentType = async (values: any) => {
-  const res = await fetch(`${api}/shipment-types`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("shipment-types");
-  return await res.json();
-};
-export const getShipmentTypes = async () => {
-  const res = await fetch(`${api}/shipment-types`, {
-    next: {
-      tags: ["shipment-types"],
-    },
-  });
-  return await res.json();
-};
-export const delShipmentType = async (name: string) => {
-  const res = await fetch(`${api}/shipment-types/${name}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("shipment-types");
-  return await res.json();
-};
-
-export const addAdditionalCharge = async (values: any) => {
-  console.log(values);
-
-  const res = await fetch(`${api}/additional-charges`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("additional-charges");
-  return await res.json();
-};
 export const getAdditionalCharges = async () => {
   const res = await fetch(`${api}/additional-charges`, {
     next: {
       tags: ["additional-charges"],
     },
   });
-  return await res.json();
-};
-export const delAdditionalCharge = async (name: string) => {
-  const res = await fetch(`${api}/additional-charges/${name}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-cache",
-  });
-  if (res.ok) revalidateTag("additional-charges");
   return await res.json();
 };

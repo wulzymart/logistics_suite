@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "next-auth/react";
+// import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
   usernameOrEmail: z
@@ -36,10 +36,10 @@ const LoginForm = ({
     },
   });
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    signIn("credentials", {
-      callbackUrl: callbackUrl,
-      ...values,
-    });
+    // signIn("credentials", {
+    //   callbackUrl: callbackUrl,
+    //   ...values,
+    // });
   };
 
   return (

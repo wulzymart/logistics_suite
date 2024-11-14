@@ -1,4 +1,4 @@
-import { DeliveryTypeOptions } from "@prisma/client";
+// import { DeliveryTypeOptions } from "@prisma/client";
 import * as z from "zod";
 
 export const ngPhoneNumbersSchema = z
