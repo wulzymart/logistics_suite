@@ -3,6 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "../hooks/query-provider";
+import WhatsAppWidget from "@/app/(website)/_components/whatsapp-widget";
+import React from "react";
 // import { getServerSession } from "next-auth";
 // import SessionProvider from "../hooks/session-provider";
 
@@ -42,6 +44,7 @@ export default async function RootLayout({
         {/*<SessionProvider session={session}>*/}
           <QueryProvider>
             {children}
+            <WhatsAppWidget/>
             <Toaster />
           </QueryProvider>
         {/*</SessionProvider>*/}
