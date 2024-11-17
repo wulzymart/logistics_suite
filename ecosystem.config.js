@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: "fll-web",
-            script: "./node_modules/next/dist/bin/next", // changed
+            script: "./node_modules/next/dist/bin/next",
             exec_mode: "cluster",
             instances: "2",
             args: "start",
