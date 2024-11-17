@@ -4,7 +4,7 @@ module.exports = {
             name: "fll-web",
             script: "./node_modules/next/dist/bin/next",
             exec_mode: "cluster",
-            instances: "2",
+            instances: "1",
             args: "start",
             env: {
                 NODE_ENV: "production",
