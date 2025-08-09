@@ -29,6 +29,7 @@ import { useStations } from "@/context/StationsContext";
 import { useLocations } from "@/context/StatesContext";
 import { submitPickupRequest } from "../(routes)/(unprotected)/pickup-request/action";
 import { useToast } from "@/components/ui/use-toast";
+import PhoneInputModed from "@/components/ui/phone-input-moded";
 
 
 export const pickupRequestSchema = z.object({
@@ -164,7 +165,7 @@ export function PickupRequestForm() {
                                         <FormItem>
                                             <FormLabel>Phone Number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="+234 xxx xxx xxxx" {...field} />
+                                                <PhoneInputModed defaultValue={field.value} onChange={field.onChange} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
