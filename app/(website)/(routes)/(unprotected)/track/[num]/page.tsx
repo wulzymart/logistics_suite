@@ -4,6 +4,7 @@ import { Package, MapPin, Phone, User, Calendar, Weight, FileText, CheckCircle, 
 import { useParams } from 'next/navigation';
 import { track } from '@/app/actions/track';
 import { getReviews, review } from '@/app/actions/review';
+import PhoneInputModed from '@/components/ui/phone-input-moded';
 interface TrackingInfo {
     id: string;
     created_at: string;
@@ -249,13 +250,7 @@ const OrderTrackingPage: React.FC = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Phone Number
                                 </label>
-                                <input
-                                    type="tel"
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    placeholder="+234xxxxxxxxxx"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                                />
+                                <PhoneInputModed defaultValue={phoneNumber} onChange={(value) => setPhoneNumber(value)} />
                             </div>
 
                             {error && (
