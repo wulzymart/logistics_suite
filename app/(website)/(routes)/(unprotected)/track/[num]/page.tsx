@@ -77,7 +77,7 @@ const OrderTrackingPage: React.FC = () => {
     }, [num]);
     const fetchReviews = async () => {
         if (!orderData) return;
-        const { data, error } = await getReviews(orderData?.order_id as string);
+        const { data, error } = await getReviews({ orderId: orderData?.order_id as string });
         if (error || !data) {
             console.error('Error fetching reviews:', error);
             return;
