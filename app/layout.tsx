@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import QueryProvider from "../hooks/query-provider";
 import WhatsAppWidget from "@/app/(website)/_components/whatsapp-widget";
 import React from "react";
+import { LocationsProvider } from "@/context/StatesContext";
+import { StationsProvider } from "@/context/StationsContext";
 // import { getServerSession } from "next-auth";
 // import SessionProvider from "../hooks/session-provider";
 
@@ -42,11 +43,13 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {/*<SessionProvider session={session}>*/}
-          <QueryProvider>
+        <LocationsProvider>
+          <StationsProvider>
             {children}
-            <WhatsAppWidget/>
+            <WhatsAppWidget />
             <Toaster />
-          </QueryProvider>
+          </StationsProvider>
+        </LocationsProvider>
         {/*</SessionProvider>*/}
       </body>
     </html>
