@@ -40,8 +40,8 @@ export const pickupRequestSchema = z.object({
     nearest_station_id: z.string().uuid("Please select a station"),
     order_description: z.string().min(10, "Provide a detailed order description"),
     estimated_weight: z.coerce.number().min(1, "Weight must be at least 1 kg"),
-    state_id: z.string().min(1, "Please select origin state"),
-    destination_state_id: z.string().min(1, "Please select destination state"),
+    state_id: z.number().min(1, "Please select origin state"),
+    destination_state_id: z.number().min(1, "Please select destination state"),
     receiver_address: z.string().min(10, "Receiver address must be at least 10 characters"),
 });
 
@@ -72,19 +72,17 @@ export function PickupRequestForm() {
             nearest_station_id: "",
             order_description: "",
             estimated_weight: 0,
-            state_id: "",
-            destination_state_id: "",
+            state_id: 0,
+            destination_state_id: 0,
             receiver_address: "",
         },
     });
     const { stations } = useStations()
-    console.log(stations)
     const { getStates } = useLocations()
     const states = getStates()
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
     const selectedStateId = form.watch("state_id");
-    console.log(selectedStateId)
     const filteredStations = stations.filter(station => station.state_id === selectedStateId);
 
     // Reset station when state changes

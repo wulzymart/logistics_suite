@@ -24,5 +24,6 @@ export async function submitPickupRequest(values: z.infer<typeof pickupRequestSc
         console.error("Error submitting pickup request:", error)
         return { success: false, error: error.message }
     }
+    // TODO: Send email to user
     return { success: true, data }
 }
